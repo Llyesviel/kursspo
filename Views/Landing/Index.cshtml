@@ -1,0 +1,58 @@
+@model IEnumerable<Landing>
+
+@{
+    ViewData["Title"] = "Посадки";
+}
+
+<h1>Посадки</h1>
+
+@if (ViewBag.FlightId != null)
+{
+    <h4>@ViewBag.FlightInfo</h4>
+    <p>
+        <a asp-action="Create" asp-route-flightId="@ViewBag.FlightId" class="btn btn-primary">Добавить посадку</a>
+        <a asp-controller="Flight" asp-action="Details" asp-route-id="@ViewBag.FlightId" class="btn btn-secondary">Назад к рейсу</a>
+    </p>
+}
+else
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Добавить посадку</a>
+    </p>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            @if (ViewBag.FlightId == null)
+            {
+                <th>Рейс</th>
+            }
+            <th>Место</th>
+            <th>Время</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            @if (ViewBag.FlightId == null)
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Flight.FlightNumber)
+                </td>
+            }
+            <td>
+                @Html.DisplayFor(modelItem => item.Location)
+            </td>
+            <td>
+                @item.Time.ToString("dd.MM.yyyy HH:mm")
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Изменить</a>
+                <a href="javascript:void(0);" onclick="showDeleteConfirmation('@Url.Action("Delete", "Landing", new { id = item.Id })')" class="btn btn-sm btn-danger">Удалить</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table> 

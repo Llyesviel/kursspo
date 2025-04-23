@@ -1,0 +1,38 @@
+@model Airport.Models.User
+
+@{
+    ViewData["Title"] = "Личный кабинет";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h3>@ViewData["Title"]</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Имя пользователя:</label>
+                        <p class="form-control-static">@Model.Username</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email:</label>
+                        <p class="form-control-static">@Model.Email</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Роль:</label>
+                        <p class="form-control-static">@Model.Role</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Дата регистрации:</label>
+                        <p class="form-control-static">@Model.CreatedAt.ToString("dd.MM.yyyy")</p>
+                    </div>
+                    <form asp-action="Logout" method="post">
+                        <button type="submit" class="btn btn-danger">Выйти</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

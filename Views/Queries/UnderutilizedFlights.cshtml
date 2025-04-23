@@ -1,0 +1,60 @@
+@model IEnumerable<Airport.ViewModels.UnderutilizedFlightViewModel>
+
+@{
+    ViewData["Title"] = "Рейсы с низкой загрузкой";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <form method="get" class="mb-4">
+            <div class="form-group">
+                <label for="minEmptySeats">Минимальное количество свободных мест:</label>
+                <input type="number" name="minEmptySeats" id="minEmptySeats" class="form-control" 
+                       value="@ViewData["MinEmptySeats"]" min="1" onchange="this.form.submit()">
+            </div>
+        </form>
+
+        @if (Model.Any())
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Номер рейса</th>
+                        <th>Самолет</th>
+                        <th>Время вылета</th>
+                        <th>Свободных мест</th>
+                        <th>Процент пустых мест</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.FlightNumber</td>
+                            <td>@item.AircraftName</td>
+                            <td>@item.DepartureTime.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@item.AvailableSeats из @item.TotalSeats</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar bg-warning" role="progressbar" 
+                                         style="width: @item.EmptyPercentage%;" 
+                                         aria-valuenow="@item.EmptyPercentage" aria-valuemin="0" aria-valuemax="100">
+                                        @item.EmptyPercentage.ToString("F1")%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                Нет рейсов с указанным количеством свободных мест.
+            </div>
+        }
+    </div>
+</div> 

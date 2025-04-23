@@ -1,0 +1,51 @@
+@model IEnumerable<Flight>
+
+@{
+    ViewData["Title"] = "Поиск рейсов";
+}
+
+<h1>Результаты поиска рейсов</h1>
+<h4>Пункт назначения: @ViewBag.Destination</h4>
+<h5>Дата вылета: @DateTime.Parse(ViewBag.DepartureDate).ToString("dd.MM.yyyy")</h5>
+
+<div class="mb-3">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Вернуться к поиску</a>
+</div>
+
+@if (Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>№ рейса</th>
+                <th>Самолет</th>
+                <th>Время вылета</th>
+                <th>Доступные места</th>
+                <th>Цена</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.FlightNumber</td>
+                    <td>@item.Aircraft.Name</td>
+                    <td>@item.DepartureTime.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@item.AvailableSeats / @item.Aircraft.SeatCount</td>
+                    <td>@item.Price</td>
+                    <td>
+                        <a asp-controller="Flight" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a>
+                        <a asp-controller="Ticket" asp-action="Create" asp-route-flightId="@item.Id" class="btn btn-sm btn-success">Купить билет</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        Рейсы не найдены. Попробуйте изменить параметры поиска.
+    </div>
+} 

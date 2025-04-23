@@ -1,0 +1,52 @@
+@model Airport.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Вход";
+    Layout = "_AuthLayout";
+}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-left">
+            <h1 class="auth-title">Авиаперевозки</h1>
+            <p class="auth-subtitle">Система управления авиаперевозками Airport</p>
+            <div class="auth-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="auth-right">
+            <h2 class="auth-title">BOOKING</h2>
+            <form asp-action="Login" method="post" class="auth-form">
+                <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+                
+                <div class="auth-form-group">
+                    <label asp-for="Email">EMAIL</label>
+                    <input asp-for="Email" type="email" placeholder="example@mail.com" />
+                    <span asp-validation-for="Email" class="field-validation-error"></span>
+                </div>
+
+                <div class="auth-form-group">
+                    <label asp-for="Password">PASSWORD</label>
+                    <input asp-for="Password" type="password" placeholder="********" />
+                    <span asp-validation-for="Password" class="field-validation-error"></span>
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="checkbox-container">
+                        <input asp-for="RememberMe" type="checkbox" />
+                        <span>Запомнить меня</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="auth-submit-btn">SIGN IN</button>
+                <p class="auth-text">Dont have an account? <a asp-action="Register">Sign Up</a></p>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

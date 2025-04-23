@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Проверка свободных мест";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="get" class="mb-4">
+            <div class="form-group">
+                <label for="flightId">Выберите рейс:</label>
+                <select name="flightId" id="flightId" class="form-control" asp-items="ViewBag.FlightId" onchange="this.form.submit()">
+                    <option value="">-- Выберите рейс --</option>
+                </select>
+            </div>
+        </form>
+
+        @if (ViewData["FlightNumber"] != null)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Рейс @ViewData["FlightNumber"]</h5>
+                    <p class="card-text">
+                        Свободных мест: <strong>@ViewData["AvailableSeats"]</strong> из <strong>@ViewData["TotalSeats"]</strong>
+                    </p>
+                    @{
+                        var availableSeats = (int)ViewData["AvailableSeats"]!;
+                        var totalSeats = (int)ViewData["TotalSeats"]!;
+                        var percentage = (int)((double)availableSeats / totalSeats * 100);
+                        var progressClass = percentage > 50 ? "bg-success" : (percentage > 20 ? "bg-warning" : "bg-danger");
+                    }
+                    <div class="progress">
+                        <div class="progress-bar @progressClass" role="progressbar" style="width: @percentage%;" 
+                             aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100">
+                            @percentage%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div> 

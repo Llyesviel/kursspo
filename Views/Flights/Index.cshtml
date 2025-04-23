@@ -1,0 +1,43 @@
+@model IEnumerable<Airport.Models.Flight>
+
+@{
+    ViewData["Title"] = "Рейсы";
+}
+
+<h1>Рейсы</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Создать новый рейс</a>
+</p>
+
+<table class="table">
+    // ... existing code ...
+</table>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Вы уверены, что хотите удалить этот рейс? Это действие нельзя отменить.')) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = this.href;
+                        
+                        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                        const tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = '__RequestVerificationToken';
+                        tokenInput.value = token;
+                        
+                        form.appendChild(tokenInput);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+} 

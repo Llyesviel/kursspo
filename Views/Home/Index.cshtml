@@ -1,0 +1,82 @@
+@{
+    ViewData["Title"] = "Главная";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Добро пожаловать</h1>
+    <p>Система управления авиаперевозками</p>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Поиск ближайшего рейса</h5>
+            </div>
+            <div class="card-body">
+                <form asp-controller="Home" asp-action="SearchFlights" method="get">
+                    <div class="form-group mb-3">
+                        <label for="destination">Пункт назначения</label>
+                        <input type="text" id="destination" name="destination" class="form-control" required />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="departureDate">Дата вылета</label>
+                        <input type="date" id="departureDate" name="departureDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Найти рейсы</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Отчеты</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a asp-controller="Home" asp-action="TicketSalesReport" 
+                       asp-route-startDate="@DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd")" 
+                       asp-route-endDate="@DateTime.Today.ToString("yyyy-MM-dd")" 
+                       class="btn btn-outline-primary">
+                        Отчет о продаже билетов
+                    </a>
+                    <a asp-controller="Home" asp-action="FlightLoadReport" class="btn btn-outline-primary">
+                        Отчет о загруженности рейсов
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Самолеты</h5>
+                <p class="card-text">Управление данными о самолетах.</p>
+                <a asp-controller="Aircraft" asp-action="Index" class="btn btn-primary">Перейти</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Рейсы</h5>
+                <p class="card-text">Управление рейсами и расписанием.</p>
+                <a asp-controller="Flight" asp-action="Index" class="btn btn-primary">Перейти</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Билеты</h5>
+                <p class="card-text">Продажа и управление билетами.</p>
+                <a asp-controller="Ticket" asp-action="Index" class="btn btn-primary">Перейти</a>
+            </div>
+        </div>
+    </div>
+</div> 

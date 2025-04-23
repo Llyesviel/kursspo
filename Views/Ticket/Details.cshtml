@@ -1,0 +1,59 @@
+@model Ticket
+
+@{
+    ViewData["Title"] = "Детали билета";
+}
+
+<h1>Детали билета</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            № кассы
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.CashboxNumber)
+        </dd>
+        <dt class="col-sm-3">
+            № рейса
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Flight.FlightNumber)
+        </dd>
+        <dt class="col-sm-3">
+            Время вылета рейса
+        </dt>
+        <dd class="col-sm-9">
+            @Model.Flight.DepartureTime.ToString("dd.MM.yyyy HH:mm")
+        </dd>
+        <dt class="col-sm-3">
+            Самолет
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Flight.Aircraft.Name)
+        </dd>
+        <dt class="col-sm-3">
+            Дата продажи
+        </dt>
+        <dd class="col-sm-9">
+            @Model.Date.ToString("dd.MM.yyyy")
+        </dd>
+        <dt class="col-sm-3">
+            Время продажи
+        </dt>
+        <dd class="col-sm-9">
+            @Model.Time.ToString("HH:mm")
+        </dd>
+        <dt class="col-sm-3">
+            Цена билета
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Flight.Price)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a>
+    <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
+</div> 

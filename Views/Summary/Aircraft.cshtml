@@ -1,0 +1,33 @@
+@model IEnumerable<Airport.ViewModels.AircraftSummaryViewModel>
+
+@{
+    ViewData["Title"] = "Сводка по самолетам";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Модель</th>
+            <th>Производитель</th>
+            <th>Всего мест</th>
+            <th>Количество рейсов</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Model</td>
+                <td>@item.Manufacturer</td>
+                <td>@item.TotalSeats</td>
+                <td>@item.FlightsCount</td>
+                <td>
+                    <a asp-controller="Aircraft" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> 

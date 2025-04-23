@@ -1,0 +1,35 @@
+@model IEnumerable<Airport.ViewModels.ExpensiveFlightViewModel>
+
+@{
+    ViewData["Title"] = "Самые дорогие рейсы";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Номер рейса</th>
+                    <th>Самолет</th>
+                    <th>Время вылета</th>
+                    <th>Продано билетов</th>
+                    <th>Общая выручка</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.FlightNumber</td>
+                        <td>@item.AircraftName</td>
+                        <td>@item.DepartureTime.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@item.TicketCount</td>
+                        <td>@item.TotalRevenue.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div> 

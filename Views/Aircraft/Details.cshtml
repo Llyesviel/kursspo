@@ -1,0 +1,35 @@
+@model Aircraft
+
+@{
+    ViewData["Title"] = "Детали самолета";
+}
+
+<h1>Детали самолета</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            Название
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-3">
+            Категория
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Category)
+        </dd>
+        <dt class="col-sm-3">
+            Количество мест
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.SeatCount)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a>
+    <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
+</div> 

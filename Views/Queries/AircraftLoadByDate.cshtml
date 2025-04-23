@@ -1,0 +1,63 @@
+@model IEnumerable<Airport.ViewModels.AircraftLoadViewModel>
+
+@{
+    ViewData["Title"] = "Загрузка самолетов";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <form method="get" class="mb-4">
+            <div class="form-group">
+                <label for="date">Выберите дату:</label>
+                <input type="date" name="date" id="date" class="form-control" value="@ViewData["SelectedDate"]" onchange="this.form.submit()">
+            </div>
+        </form>
+
+        @if (Model.Any())
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Номер рейса</th>
+                        <th>Самолет</th>
+                        <th>Время вылета</th>
+                        <th>Занято мест</th>
+                        <th>Загрузка</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.FlightNumber</td>
+                            <td>@item.AircraftName</td>
+                            <td>@item.DepartureTime.ToString("HH:mm")</td>
+                            <td>@item.OccupiedSeats из @item.TotalSeats</td>
+                            <td>
+                                @{
+                                    var progressClass = item.LoadPercentage > 80 ? "bg-danger" : 
+                                        (item.LoadPercentage > 60 ? "bg-warning" : "bg-success");
+                                }
+                                <div class="progress">
+                                    <div class="progress-bar @progressClass" role="progressbar" 
+                                         style="width: @item.LoadPercentage%;" 
+                                         aria-valuenow="@item.LoadPercentage" aria-valuemin="0" aria-valuemax="100">
+                                        @item.LoadPercentage.ToString("F1")%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                На выбранную дату нет запланированных рейсов.
+            </div>
+        }
+    </div>
+</div> 

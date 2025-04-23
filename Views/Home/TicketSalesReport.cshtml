@@ -1,0 +1,76 @@
+@model IEnumerable<Airport.Models.Ticket>
+
+@{
+    ViewData["Title"] = "Отчет о продаже билетов";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <form method="get" class="form-inline">
+            <div class="form-group mx-2">
+                <label for="startDate" class="mr-2">Начальная дата:</label>
+                <input type="date" id="startDate" name="startDate" class="form-control" value="@ViewBag.StartDate">
+            </div>
+            <div class="form-group mx-2">
+                <label for="endDate" class="mr-2">Конечная дата:</label>
+                <input type="date" id="endDate" name="endDate" class="form-control" value="@ViewBag.EndDate">
+            </div>
+            <button type="submit" class="btn btn-primary">Показать</button>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Итоги за период</h5>
+                <p class="card-text">
+                    Продано билетов: <strong>@ViewBag.TicketCount</strong><br>
+                    Общая выручка: <strong>@ViewBag.TotalSales.ToString("C")</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Время</th>
+                    <th>№ кассы</th>
+                    <th>№ рейса</th>
+                    <th>Самолет</th>
+                    <th>Стоимость</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ticket in Model)
+                {
+                    <tr>
+                        <td>@ticket.Date.ToString("dd.MM.yyyy")</td>
+                        <td>@ticket.Time.ToString(@"hh\:mm")</td>
+                        <td>@ticket.CashboxNumber</td>
+                        <td>@ticket.Flight.FlightNumber</td>
+                        <td>@ticket.Flight.Aircraft.Name</td>
+                        <td>@ticket.Flight.Price.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Устанавливаем минимальную дату для конечной даты равной начальной
+        document.getElementById('startDate').addEventListener('change', function() {
+            document.getElementById('endDate').min = this.value;
+        });
+    </script>
+} 
