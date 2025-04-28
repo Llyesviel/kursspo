@@ -69,7 +69,7 @@ app.UseAuthorization();
 // Сначала регистрируем маршруты MVC
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Auth}/{action=Login}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // Затем регистрируем Razor Pages
 app.MapRazorPages();

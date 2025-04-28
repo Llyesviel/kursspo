@@ -6,8 +6,8 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8 mx-auto text-center">
-                <h1 class="hero-title">Flyfty</h1>
-                <p class="hero-subtitle">Найдите лучшие авиабилеты для вашего путешествия</p>
+                <h1 class="hero-title">Airlogistics</h1>
+                <p class="hero-subtitle">Эффективное управление рейсами, самолетами и билетами</p>
             </div>
         </div>
         
@@ -16,49 +16,22 @@
                 <div class="search-card">
                     <form asp-controller="Home" asp-action="SearchFlights" method="get">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="flightType">Тип полета</label>
-                                    <select class="form-control" id="flightType" name="flightType">
-                                        <option value="oneway">В одну сторону</option>
-                                        <option value="round">Туда и обратно</option>
-                                    </select>
+                                    <label for="destination">Пункт назначения</label>
+                                    <input type="text" id="destination" name="destination" class="form-control" placeholder="Введите название города или аэропорта" required />
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="origin">Откуда</label>
-                                    <input type="text" id="origin" name="origin" class="form-control" placeholder="Париж" required />
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="destination">Куда</label>
-                                    <input type="text" id="destination" name="destination" class="form-control" placeholder="Нью-Йорк" required />
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="passengers">Пассажиры и класс</label>
-                                    <input type="text" id="passengers" name="passengers" class="form-control" placeholder="1 взрослый, бизнес-класс" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="departureDate">Дата вылета</label>
                                     <input type="date" id="departureDate" name="departureDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="returnDate">Дата возвращения</label>
-                                    <input type="date" id="returnDate" name="returnDate" class="form-control" value="@DateTime.Today.AddDays(7).ToString("yyyy-MM-dd")" />
-                                </div>
-                            </div>
-                            <div class="col-md-6 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100 mt-4">
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
                                     <i class="fas fa-search"></i> Найти рейсы
                                 </button>
                             </div>
@@ -70,174 +43,83 @@
     </div>
 </div>
 
-<div class="container">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <ul class="nav nav-pills justify-content-center">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">Дешевле</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Быстрее</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Больше</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="flight-results">
-        <div class="flight-card">
-            <div class="airline-logo">
-                <img src="https://via.placeholder.com/50" alt="Авиакомпания" class="img-fluid">
-            </div>
-            <div class="flight-times">
-                <div class="departure">
-                    <div class="flight-time">12:30</div>
-                    <div class="airport">ПАР</div>
-                </div>
-                <div class="flight-duration">
-                    <div class="duration-time">7ч 50м</div>
-                    <div class="plane-line">
-                        <svg width="100" height="20" xmlns="http://www.w3.org/2000/svg">
-                            <line x1="0" y1="10" x2="100" y2="10" stroke="#ddd" stroke-width="1"/>
-                            <circle cx="50" cy="10" r="3" fill="#aaa"/>
-                        </svg>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="modern-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-plane text-primary"></i> Самолеты
+                    </h5>
+                    <p class="card-text">Управление данными о самолетах, их характеристиках и вместимости.</p>
+                    <div class="d-grid">
+                        <a asp-controller="Aircraft" asp-action="Index" class="btn btn-primary">Перейти</a>
                     </div>
                 </div>
-                <div class="arrival">
-                    <div class="flight-time">1:30 PM</div>
-                    <div class="airport">НЙК</div>
-                </div>
-            </div>
-            <div class="flight-price">
-                <div>$9,165</div>
-                <button class="select-btn mt-2">ВЫБРАТЬ</button>
             </div>
         </div>
-
-        <div class="flight-card">
-            <div class="airline-logo">
-                <img src="https://via.placeholder.com/50" alt="Авиакомпания" class="img-fluid">
-            </div>
-            <div class="flight-times">
-                <div class="departure">
-                    <div class="flight-time">8:00 PM</div>
-                    <div class="airport">ПАР</div>
-                </div>
-                <div class="flight-duration">
-                    <div class="duration-time">8ч 30м</div>
-                    <div class="plane-line">
-                        <svg width="100" height="20" xmlns="http://www.w3.org/2000/svg">
-                            <line x1="0" y1="10" x2="100" y2="10" stroke="#ddd" stroke-width="1"/>
-                            <circle cx="50" cy="10" r="3" fill="#aaa"/>
-                        </svg>
+        <div class="col-md-4 mb-4">
+            <div class="modern-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-route text-primary"></i> Рейсы
+                    </h5>
+                    <p class="card-text">Управление рейсами, расписанием и маршрутами полетов.</p>
+                    <div class="d-grid">
+                        <a asp-controller="Flight" asp-action="Index" class="btn btn-primary">Перейти</a>
                     </div>
                 </div>
-                <div class="arrival">
-                    <div class="flight-time">10:15 PM</div>
-                    <div class="airport">НЙК</div>
-                </div>
-            </div>
-            <div class="flight-price">
-                <div>$10,780</div>
-                <button class="select-btn mt-2">ВЫБРАТЬ</button>
             </div>
         </div>
-
-        <div class="flight-card">
-            <div class="airline-logo">
-                <img src="https://via.placeholder.com/50" alt="Авиакомпания" class="img-fluid">
-            </div>
-            <div class="flight-times">
-                <div class="departure">
-                    <div class="flight-time">2:30 PM</div>
-                    <div class="airport">ПАР</div>
-                </div>
-                <div class="flight-duration">
-                    <div class="duration-time">8ч 55м</div>
-                    <div class="plane-line">
-                        <svg width="100" height="20" xmlns="http://www.w3.org/2000/svg">
-                            <line x1="0" y1="10" x2="100" y2="10" stroke="#ddd" stroke-width="1"/>
-                            <circle cx="50" cy="10" r="3" fill="#aaa"/>
-                        </svg>
+        <div class="col-md-4 mb-4">
+            <div class="modern-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-ticket-alt text-primary"></i> Билеты
+                    </h5>
+                    <p class="card-text">Продажа билетов и управление бронированиями мест на рейсы.</p>
+                    <div class="d-grid">
+                        <a asp-controller="Ticket" asp-action="Index" class="btn btn-primary">Перейти</a>
                     </div>
                 </div>
-                <div class="arrival">
-                    <div class="flight-time">5:25 PM</div>
-                    <div class="airport">НЙК</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+            <div class="modern-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-line text-primary"></i> Отчеты</h5>
                 </div>
-            </div>
-            <div class="flight-price">
-                <div>$9,967</div>
-                <button class="select-btn mt-2">ВЫБРАТЬ</button>
-            </div>
-        </div>
-
-        <div class="text-center mt-4 mb-5">
-            <button class="btn btn-outline-primary px-4 py-2">ПОКАЗАТЬ БОЛЬШЕ</button>
-        </div>
-    </div>
-
-    <div class="row mt-5">
-        <div class="col-md-8 mx-auto text-center">
-            <blockquote class="blockquote">
-                <p class="mb-0">"Это самый простой способ добраться до мест своей мечты"</p>
-                <footer class="blockquote-footer mt-2">ОТ ПОКУПАТЕЛЕЙ</footer>
-            </blockquote>
-        </div>
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Отчеты</h5>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a asp-controller="Home" asp-action="TicketSalesReport" 
-                       asp-route-startDate="@DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd")" 
-                       asp-route-endDate="@DateTime.Today.ToString("yyyy-MM-dd")" 
-                       class="btn btn-outline-primary">
-                        Отчет о продаже билетов
-                    </a>
-                    <a asp-controller="Home" asp-action="FlightLoadReport" class="btn btn-outline-primary">
-                        Отчет о загруженности рейсов
-                    </a>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Home" asp-action="TicketSalesReport" 
+                           asp-route-startDate="@DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd")" 
+                           asp-route-endDate="@DateTime.Today.ToString("yyyy-MM-dd")" 
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-file-invoice-dollar"></i> Отчет о продаже билетов
+                        </a>
+                        <a asp-controller="Home" asp-action="FlightLoadReport" class="btn btn-outline-primary">
+                            <i class="fas fa-percentage"></i> Отчет о загруженности рейсов
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Самолеты</h5>
-                <p class="card-text">Управление данными о самолетах.</p>
-                <a asp-controller="Aircraft" asp-action="Index" class="btn btn-primary">Перейти</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Рейсы</h5>
-                <p class="card-text">Управление рейсами и расписанием.</p>
-                <a asp-controller="Flight" asp-action="Index" class="btn btn-primary">Перейти</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Билеты</h5>
-                <p class="card-text">Продажа и управление билетами.</p>
-                <a asp-controller="Ticket" asp-action="Index" class="btn btn-primary">Перейти</a>
+        <div class="col-md-6 mb-4">
+            <div class="modern-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-plane-arrival text-primary"></i> Посадки</h5>
+                </div>
+                <div class="card-body">
+                    <p>Управление данными о посадках рейсов в промежуточных и конечных пунктах.</p>
+                    <div class="d-grid">
+                        <a asp-controller="Landing" asp-action="Index" class="btn btn-primary">
+                            <i class="fas fa-list"></i> Список посадок
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

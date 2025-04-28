@@ -3,79 +3,127 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Система управления авиаперевозками</title>
+    <title>@ViewData["Title"] - Airlogistics</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/modern.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Airport</a>
+    <header class="modern-header">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <span style="color: #00a8ff;">Air</span>logistics
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                    <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Главная</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Главная
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Aircraft" asp-action="Index">Самолеты</a>
+                            <a class="nav-link" asp-controller="Aircraft" asp-action="Index">
+                                <i class="fas fa-plane"></i> Самолеты
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Flight" asp-action="Index">Рейсы</a>
+                            <a class="nav-link" asp-controller="Flight" asp-action="Index">
+                                <i class="fas fa-route"></i> Рейсы
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Landing" asp-action="Index">Посадки</a>
+                            <a class="nav-link" asp-controller="Landing" asp-action="Index">
+                                <i class="fas fa-plane-arrival"></i> Посадки
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Ticket" asp-action="Index">Билеты</a>
+                            <a class="nav-link" asp-controller="Ticket" asp-action="Index">
+                                <i class="fas fa-ticket-alt"></i> Билеты
+                            </a>
                         </li>
                     </ul>
                     <ul class="navbar-nav">
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Profile">Личный кабинет</a>
+                                <a class="nav-link" asp-controller="Auth" asp-action="Profile">
+                                    <i class="fas fa-user-circle"></i> Профиль
+                                </a>
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="Auth" asp-action="Logout" method="post">
-                                    <button type="submit" class="btn btn-link nav-link text-dark">Выйти</button>
+                                    <button type="submit" class="btn btn-link nav-link">
+                                        <i class="fas fa-sign-out-alt"></i> Выйти
+                                    </button>
                                 </form>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Войти</a>
+                                <a class="nav-link" asp-controller="Auth" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt"></i> Войти
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Регистрация</a>
+                                <a class="nav-link" asp-controller="Auth" asp-action="Register">
+                                    <i class="fas fa-user-plus"></i> Регистрация
+                                </a>
                             </li>
                         }
                     </ul>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    
+    <main role="main">
+        @RenderBody()
+    </main>
 
-    <footer class="border-top footer text-muted">
+    <footer class="modern-footer">
         <div class="container">
-            &copy; @DateTime.Now.Year - Система управления авиаперевозками
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Airlogistics</h5>
+                    <p>Эффективное решение для управления авиарейсами, самолетами и билетами.</p>
+                </div>
+                <div class="col-md-3">
+                    <h6>Полезные ссылки</h6>
+                    <ul class="list-unstyled">
+                        <li><a asp-controller="Aircraft" asp-action="Index">Самолеты</a></li>
+                        <li><a asp-controller="Flight" asp-action="Index">Рейсы</a></li>
+                        <li><a asp-controller="Ticket" asp-action="Index">Билеты</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Отчеты</h6>
+                    <ul class="list-unstyled">
+                        <li><a asp-controller="Home" asp-action="FlightLoadReport">Загруженность рейсов</a></li>
+                        <li><a asp-controller="Home" asp-action="TicketSalesReport"
+                                asp-route-startDate="@DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd")"
+                                asp-route-endDate="@DateTime.Today.ToString("yyyy-MM-dd")">Продажа билетов</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="mt-4 mb-4" style="border-color: rgba(255,255,255,0.1);">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-0">&copy; @DateTime.Now.Year Airlogistics. Все права защищены.</p>
+                </div>
+            </div>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/notifications.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
     
     @await Html.PartialAsync("_DeleteConfirmationModal")

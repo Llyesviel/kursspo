@@ -4,48 +4,75 @@
     ViewData["Title"] = "Поиск рейсов";
 }
 
-<h1>Результаты поиска рейсов</h1>
-<h4>Пункт назначения: @ViewBag.Destination</h4>
-<h5>Дата вылета: @DateTime.Parse(ViewBag.DepartureDate).ToString("dd.MM.yyyy")</h5>
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-3">Результаты поиска рейсов</h1>
+            <h4>Пункт назначения: @ViewBag.Destination</h4>
+            <h5>Дата вылета: @DateTime.Parse(ViewBag.DepartureDate).ToString("dd.MM.yyyy")</h5>
+        </div>
+        <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Вернуться к поиску
+            </a>
+        </div>
+    </div>
 
-<div class="mb-3">
-    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Вернуться к поиску</a>
-</div>
-
-@if (Model.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>№ рейса</th>
-                <th>Самолет</th>
-                <th>Время вылета</th>
-                <th>Доступные места</th>
-                <th>Цена</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
+    @if (Model.Any())
+    {
+        <div class="flight-results">
             @foreach (var item in Model)
             {
-                <tr>
-                    <td>@item.FlightNumber</td>
-                    <td>@item.Aircraft.Name</td>
-                    <td>@item.DepartureTime.ToString("dd.MM.yyyy HH:mm")</td>
-                    <td>@item.AvailableSeats / @item.Aircraft.SeatCount</td>
-                    <td>@item.Price</td>
-                    <td>
-                        <a asp-controller="Flight" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a>
-                        <a asp-controller="Ticket" asp-action="Create" asp-route-flightId="@item.Id" class="btn btn-sm btn-success">Купить билет</a>
-                    </td>
-                </tr>
+                <div class="flight-card">
+                    <div class="airline-logo">
+                        <img src="https://via.placeholder.com/50" alt="@item.Aircraft.Name" class="img-fluid">
+                    </div>
+                    <div class="flight-times">
+                        <div class="departure">
+                            <div class="flight-time">@item.DepartureTime.ToString("HH:mm")</div>
+                            <div class="airport">@item.FlightNumber.Substring(0, 3)</div>
+                        </div>
+                        <div class="flight-duration">
+                            <div class="duration-time">~2ч 30м</div>
+                            <div class="plane-line">
+                                <svg width="100" height="20" xmlns="http://www.w3.org/2000/svg">
+                                    <line x1="0" y1="10" x2="100" y2="10" stroke="#ddd" stroke-width="1"/>
+                                    <circle cx="50" cy="10" r="3" fill="#aaa"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="arrival">
+                            <div class="flight-time">@item.DepartureTime.AddHours(2.5).ToString("HH:mm")</div>
+                            <div class="airport">@ViewBag.Destination.ToString().Substring(0, 3).ToUpper()</div>
+                        </div>
+                    </div>
+                    <div class="flight-details">
+                        <div><strong>Рейс:</strong> @item.FlightNumber</div>
+                        <div><strong>Самолет:</strong> @item.Aircraft.Name</div>
+                        <div><strong>Места:</strong> @item.AvailableSeats / @item.Aircraft.SeatCount</div>
+                    </div>
+                    <div class="flight-price">
+                        <div>@item.Price ₽</div>
+                        <div class="d-flex mt-2 gap-2">
+                            <a asp-controller="Flight" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-info-circle"></i> Детали
+                            </a>
+                            <a asp-controller="Ticket" asp-action="Create" asp-route-flightId="@item.Id" class="select-btn">
+                                <i class="fas fa-ticket-alt"></i> Оформить билет
+                            </a>
+                        </div>
+                    </div>
+                </div>
             }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-info">
-        Рейсы не найдены. Попробуйте изменить параметры поиска.
-    </div>
-} 
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info p-4 text-center">
+            <i class="fas fa-plane-slash fa-3x mb-3"></i>
+            <h4>Рейсы не найдены</h4>
+            <p>По вашему запросу не найдено рейсов с доступными местами. Попробуйте изменить параметры поиска или выбрать другую дату.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-2">Вернуться к поиску</a>
+        </div>
+    }
+</div> 

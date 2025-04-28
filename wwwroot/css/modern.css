@@ -43,7 +43,7 @@ body {
 
 /* Hero секция */
 .hero-section {
-    background-image: url('/img/sky.jpg'); /* Путь к фоновому изображению */
+    background: linear-gradient(135deg, #2980b9, #6dd5fa, #ffffff);
     background-size: cover;
     background-position: center;
     color: white;
@@ -238,6 +238,13 @@ body {
     align-items: center;
 }
 
+.flight-card .flight-details {
+    padding: 0 20px;
+    font-size: 0.9rem;
+    color: #666;
+    min-width: 150px;
+}
+
 .flight-card .flight-time {
     font-size: 1.5rem;
     font-weight: 700;
@@ -305,6 +312,10 @@ body {
     }
     
     .flight-card .flight-times {
+        margin-bottom: 15px;
+    }
+    
+    .flight-card .flight-details {
         margin-bottom: 15px;
     }
     
