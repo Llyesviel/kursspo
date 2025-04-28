@@ -82,7 +82,12 @@ namespace Airport.Controllers
         [Authorize]
         public async Task<IActionResult> Profile()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return RedirectToAction("Login");
+            }
+            
             var user = await _context.Users.FindAsync(userId);
             
             if (user == null)

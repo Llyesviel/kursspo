@@ -8,8 +8,8 @@
     --accent-color: #00a8ff;
 }
 
-/* Видео на фоне */
-.video-background {
+/* Анимированный фон */
+.vanta-background {
     position: fixed;
     top: 0;
     left: 0;
@@ -19,20 +19,8 @@
     overflow: hidden;
 }
 
-.video-background video {
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    object-fit: cover;
-}
-
-/* Затемнение видео для лучшей читаемости форм */
-.video-background::after {
+/* Затемнение для лучшей читаемости форм */
+.vanta-background::after {
     content: '';
     position: absolute;
     top: 0;
@@ -40,6 +28,7 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.3);
+    pointer-events: none;
 }
 
 .auth-container {
@@ -165,7 +154,7 @@
     padding: 13px;
     border: none;
     border-radius: 12px;
-    background: rgba(0, 168, 255, 0.8);
+    background: rgba(135, 206, 250, 0.6);
     color: white;
     font-size: 1rem;
     font-weight: 600;
@@ -180,7 +169,7 @@
 .auth-submit-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-    background: rgba(0, 168, 255, 0.9);
+    background: rgba(135, 206, 250, 0.8);
 }
 
 .auth-text {
@@ -201,10 +190,26 @@
 }
 
 .auth-icon {
-    width: 150px;
-    height: 150px;
+    width: 195px;
+    height: 195px;
     margin: 0 auto 30px;
-    opacity: 0.8;
+    opacity: 0.9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-icon svg {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
+    transition: transform 0.3s ease, filter 0.3s ease;
+    max-width: 100%;
+    height: auto;
+    stroke-width: 1.2;
+}
+
+.auth-icon:hover svg {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 1));
 }
 
 .validation-summary-errors {
@@ -231,18 +236,50 @@
 }
 
 /* Стили для чекбоксов */
+.remember-me {
+    margin: 10px 0;
+}
+
 .checkbox-container {
     display: flex;
     align-items: center;
+    position: relative;
     font-size: 0.9rem;
     color: #fff;
     margin-bottom: 0;
     cursor: pointer;
+    padding: 5px 0;
+}
+
+.checkbox-container span {
+    margin-right: 10px;
+    line-height: 15px;
+    display: inline-block;
 }
 
 .checkbox-container input[type="checkbox"] {
-    margin-right: 8px;
+    position: relative;
+    opacity: 1;
     cursor: pointer;
+    height: 15px;
+    width: 15px;
+    margin: 0;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+}
+
+/* Удаляем все стили для .checkmark, так как они мешают нормальному отображению чекбокса */
+.checkmark {
+    display: none;
+}
+
+.checkbox-container:hover input ~ .checkmark,
+.checkbox-container input:checked ~ .checkmark,
+.checkmark:after,
+.checkbox-container input:checked ~ .checkmark:after,
+.checkbox-container .checkmark:after {
+    display: none;
 }
 
 .auth-form-group.focused label {
@@ -251,17 +288,6 @@
 
 .auth-form-group input.has-value {
     border-color: rgba(255, 255, 255, 0.5);
-}
-
-/* Добавляю немного красивостей для иконок в левой части */
-.auth-icon svg {
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
-    transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.auth-icon:hover svg {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
 }
 
 /* Адаптивный дизайн */

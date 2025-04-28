@@ -2,33 +2,195 @@
     ViewData["Title"] = "Главная";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Добро пожаловать</h1>
-    <p>Система управления авиаперевозками</p>
-</div>
-
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Поиск ближайшего рейса</h5>
+<div class="hero-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mx-auto text-center">
+                <h1 class="hero-title">Flyfty</h1>
+                <p class="hero-subtitle">Найдите лучшие авиабилеты для вашего путешествия</p>
             </div>
-            <div class="card-body">
-                <form asp-controller="Home" asp-action="SearchFlights" method="get">
-                    <div class="form-group mb-3">
-                        <label for="destination">Пункт назначения</label>
-                        <input type="text" id="destination" name="destination" class="form-control" required />
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="departureDate">Дата вылета</label>
-                        <input type="date" id="departureDate" name="departureDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
-                    </div>
-                    <button type="submit" class="btn btn-primary">Найти рейсы</button>
-                </form>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="search-card">
+                    <form asp-controller="Home" asp-action="SearchFlights" method="get">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="flightType">Тип полета</label>
+                                    <select class="form-control" id="flightType" name="flightType">
+                                        <option value="oneway">В одну сторону</option>
+                                        <option value="round">Туда и обратно</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="origin">Откуда</label>
+                                    <input type="text" id="origin" name="origin" class="form-control" placeholder="Париж" required />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="destination">Куда</label>
+                                    <input type="text" id="destination" name="destination" class="form-control" placeholder="Нью-Йорк" required />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="passengers">Пассажиры и класс</label>
+                                    <input type="text" id="passengers" name="passengers" class="form-control" placeholder="1 взрослый, бизнес-класс" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="departureDate">Дата вылета</label>
+                                    <input type="date" id="departureDate" name="departureDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="returnDate">Дата возвращения</label>
+                                    <input type="date" id="returnDate" name="returnDate" class="form-control" value="@DateTime.Today.AddDays(7).ToString("yyyy-MM-dd")" />
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100 mt-4">
+                                    <i class="fas fa-search"></i> Найти рейсы
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-    
+</div>
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <ul class="nav nav-pills justify-content-center">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Дешевле</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Быстрее</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Больше</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="flight-results">
+        <div class="flight-card">
+            <div class="airline-logo">
+                <img src="https://via.placeholder.com/50" alt="Авиакомпания" class="img-fluid">
+            </div>
+            <div class="flight-times">
+                <div class="departure">
+                    <div class="flight-time">12:30</div>
+                    <div class="airport">ПАР</div>
+                </div>
+                <div class="flight-duration">
+                    <div class="duration-time">7ч 50м</div>
+                    <div class="plane-line">
+                        <svg width="100" height="20" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="0" y1="10" x2="100" y2="10" stroke="#ddd" stroke-width="1"/>
+                            <circle cx="50" cy="10" r="3" fill="#aaa"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="arrival">
+                    <div class="flight-time">1:30 PM</div>
+                    <div class="airport">НЙК</div>
+                </div>
+            </div>
+            <div class="flight-price">
+                <div>$9,165</div>
+                <button class="select-btn mt-2">ВЫБРАТЬ</button>
+            </div>
+        </div>
+
+        <div class="flight-card">
+            <div class="airline-logo">
+                <img src="https://via.placeholder.com/50" alt="Авиакомпания" class="img-fluid">
+            </div>
+            <div class="flight-times">
+                <div class="departure">
+                    <div class="flight-time">8:00 PM</div>
+                    <div class="airport">ПАР</div>
+                </div>
+                <div class="flight-duration">
+                    <div class="duration-time">8ч 30м</div>
+                    <div class="plane-line">
+                        <svg width="100" height="20" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="0" y1="10" x2="100" y2="10" stroke="#ddd" stroke-width="1"/>
+                            <circle cx="50" cy="10" r="3" fill="#aaa"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="arrival">
+                    <div class="flight-time">10:15 PM</div>
+                    <div class="airport">НЙК</div>
+                </div>
+            </div>
+            <div class="flight-price">
+                <div>$10,780</div>
+                <button class="select-btn mt-2">ВЫБРАТЬ</button>
+            </div>
+        </div>
+
+        <div class="flight-card">
+            <div class="airline-logo">
+                <img src="https://via.placeholder.com/50" alt="Авиакомпания" class="img-fluid">
+            </div>
+            <div class="flight-times">
+                <div class="departure">
+                    <div class="flight-time">2:30 PM</div>
+                    <div class="airport">ПАР</div>
+                </div>
+                <div class="flight-duration">
+                    <div class="duration-time">8ч 55м</div>
+                    <div class="plane-line">
+                        <svg width="100" height="20" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="0" y1="10" x2="100" y2="10" stroke="#ddd" stroke-width="1"/>
+                            <circle cx="50" cy="10" r="3" fill="#aaa"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="arrival">
+                    <div class="flight-time">5:25 PM</div>
+                    <div class="airport">НЙК</div>
+                </div>
+            </div>
+            <div class="flight-price">
+                <div>$9,967</div>
+                <button class="select-btn mt-2">ВЫБРАТЬ</button>
+            </div>
+        </div>
+
+        <div class="text-center mt-4 mb-5">
+            <button class="btn btn-outline-primary px-4 py-2">ПОКАЗАТЬ БОЛЬШЕ</button>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-8 mx-auto text-center">
+            <blockquote class="blockquote">
+                <p class="mb-0">"Это самый простой способ добраться до мест своей мечты"</p>
+                <footer class="blockquote-footer mt-2">ОТ ПОКУПАТЕЛЕЙ</footer>
+            </blockquote>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">

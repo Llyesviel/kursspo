@@ -1,0 +1,324 @@
+:root {
+    --primary-color: #00a8ff;
+    --secondary-color: #0097e6;
+    --dark-color: #2c3e50;
+    --light-color: #f0f0f0;
+    --border-radius: 10px;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Шапка сайта */
+.modern-header {
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 15px 0;
+}
+
+.modern-header .navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.modern-header .navbar-nav .nav-link {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    color: var(--dark-color);
+    transition: var(--transition);
+}
+
+.modern-header .navbar-nav .nav-link:hover {
+    color: var(--primary-color);
+}
+
+/* Hero секция */
+.hero-section {
+    background-image: url('/img/sky.jpg'); /* Путь к фоновому изображению */
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 80px 0;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    font-weight: 300;
+}
+
+/* Карточка поиска */
+.search-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.search-card .form-group {
+    margin-bottom: 20px;
+}
+
+.search-card label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.search-card .form-control {
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    padding: 12px 15px;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.search-card .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 168, 255, 0.15);
+}
+
+.search-card .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 12px 25px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.search-card .btn-primary:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+/* Современные карточки */
+.modern-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+    height: 100%;
+    border: none;
+}
+
+.modern-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.modern-card .card-header {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 20px 25px;
+}
+
+.modern-card .card-body {
+    padding: 25px;
+}
+
+.modern-card .card-title {
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+.modern-card .btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.modern-card .btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.modern-card .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.modern-card .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.modern-card .btn-primary:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+/* Модерн-футер */
+.modern-footer {
+    background-color: #2c3e50;
+    color: white;
+    padding: 30px 0;
+    margin-top: 50px;
+}
+
+.modern-footer a {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.modern-footer a:hover {
+    color: white;
+    text-decoration: none;
+}
+
+/* Результаты поиска */
+.flight-results {
+    margin-top: 30px;
+}
+
+.flight-card {
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: white;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.flight-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.flight-card .airline-logo {
+    flex: 0 0 70px;
+    margin-right: 20px;
+}
+
+.flight-card .flight-times {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flight-card .flight-time {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.flight-card .flight-duration {
+    text-align: center;
+    position: relative;
+    padding: 0 20px;
+}
+
+.flight-card .flight-duration::before,
+.flight-card .flight-duration::after {
+    content: '';
+    height: 1px;
+    width: 40px;
+    background-color: #ddd;
+    position: absolute;
+    top: 50%;
+}
+
+.flight-card .flight-duration::before {
+    left: -35px;
+}
+
+.flight-card .flight-duration::after {
+    right: -35px;
+}
+
+.flight-card .flight-price {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.flight-card .select-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.flight-card .select-btn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+/* Адаптивность */
+@media (max-width: 992px) {
+    .flight-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .flight-card .airline-logo {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .flight-card .flight-times {
+        margin-bottom: 15px;
+    }
+    
+    .flight-card .flight-price {
+        margin-bottom: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+} 
