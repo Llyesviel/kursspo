@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Административная панель</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/common.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+</head>
+<body class="admin-body">
+    <!-- Шапка административной панели -->
+    <header class="admin-header">
+        <div class="d-flex align-items-center">
+            <button class="admin-menu-toggle me-3" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a asp-controller="Admin" asp-action="Index" class="admin-header-brand">
+                <span style="color: #3498db;">Air</span>logistics <span class="ms-2 fs-6">Панель управления</span>
+            </a>
+        </div>
+        <div class="admin-header-user">
+            <span class="admin-user-name d-none d-md-block">@User.Identity.Name</span>
+            <form asp-controller="Auth" asp-action="Logout" method="post">
+                <button type="submit" class="admin-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span class="d-none d-md-inline">Выйти</span>
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Боковое меню -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <ul class="admin-menu">
+            <li class="admin-menu-item">
+                <a asp-controller="Admin" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
+                    <i class="fas fa-tachometer-alt"></i> Дашборд
+                </a>
+            </li>
+            
+            <li class="admin-menu-group">Управление данными</li>
+            
+            <li class="admin-menu-item">
+                <a asp-controller="Aircraft" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Aircraft" ? "active" : "")">
+                    <i class="fas fa-plane"></i> Самолеты
+                </a>
+            </li>
+            <li class="admin-menu-item">
+                <a asp-controller="Flight" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Flight" ? "active" : "")">
+                    <i class="fas fa-route"></i> Рейсы
+                </a>
+            </li>
+            <li class="admin-menu-item">
+                <a asp-controller="Landing" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Landing" ? "active" : "")">
+                    <i class="fas fa-plane-arrival"></i> Посадки
+                </a>
+            </li>
+            <li class="admin-menu-item">
+                <a asp-controller="Admin" asp-action="Departures" class="admin-menu-link @(ViewContext.RouteData.Values["Action"].ToString() == "Departures" ? "active" : "")">
+                    <i class="fas fa-plane-departure"></i> Вылеты
+                </a>
+            </li>
+            <li class="admin-menu-item">
+                <a asp-controller="Ticket" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Ticket" ? "active" : "")">
+                    <i class="fas fa-ticket-alt"></i> Билеты
+                </a>
+            </li>
+            
+            <li class="admin-menu-group">Отчеты</li>
+            
+            <li class="admin-menu-item">
+                <a asp-controller="Home" asp-action="TicketSalesReport" asp-route-startDate="@DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd")" asp-route-endDate="@DateTime.Today.ToString("yyyy-MM-dd")" class="admin-menu-link @(ViewContext.RouteData.Values["Action"].ToString() == "TicketSalesReport" ? "active" : "")">
+                    <i class="fas fa-file-invoice-dollar"></i> Продажа билетов
+                </a>
+            </li>
+            <li class="admin-menu-item">
+                <a asp-controller="Home" asp-action="FlightLoadReport" class="admin-menu-link @(ViewContext.RouteData.Values["Action"].ToString() == "FlightLoadReport" ? "active" : "")">
+                    <i class="fas fa-percentage"></i> Загруженность рейсов
+                </a>
+            </li>
+            
+            <li class="admin-menu-group">Система</li>
+            
+            <li class="admin-menu-item">
+                <a asp-controller="Home" asp-action="Index" class="admin-menu-link">
+                    <i class="fas fa-home"></i> Вернуться на сайт
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Наложение для мобильных устройств -->
+    <div class="admin-overlay" id="adminOverlay"></div>
+
+    <!-- Основное содержимое -->
+    <main class="admin-content" id="adminContent">
+        @RenderBody()
+    </main>
+
+    <!-- Подключаем оповещения -->
+    <partial name="_Notifications" />
+    
+    <!-- Подключаем модальное окно подтверждения удаления -->
+    <partial name="_DeleteConfirmationModal" />
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html> 

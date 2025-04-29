@@ -1,335 +1,524 @@
 :root {
-    --primary-color: #00a8ff;
-    --secondary-color: #0097e6;
-    --dark-color: #2c3e50;
-    --light-color: #f0f0f0;
-    --border-radius: 10px;
-    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    --transition: all 0.3s ease;
+    --primary-color: #0a4e85;
+    --primary-dark: #053661;
+    --primary-light: #2280c5;
+    --accent-color: #00a3e0;
+    --accent-light: #39c8ff;
+    --secondary-color: #f8f9fa;
+    --text-color: #343a40;
+    --text-light: #6c757d;
+    --background-light: #f8f9fa;
+    --border-color: #dee2e6;
+    --shadow-color: rgba(10, 78, 133, 0.1);
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
 }
 
+/* Общие стили */
 body {
     font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 0;
-    color: #333;
+    color: var(--text-color);
+    background-color: #ffffff;
     line-height: 1.6;
 }
 
-/* Шапка сайта */
-.modern-header {
-    background-color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    padding: 15px 0;
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 1rem;
 }
 
-.modern-header .navbar-brand {
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: var(--primary-light);
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: white;
+    box-shadow: 0 4px 10px var(--shadow-color);
+}
+
+.btn-outline-light {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s;
+}
+
+.btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.15);
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.bg-light {
+    background-color: var(--background-light) !important;
+}
+
+/* Шапка сайта */
+.navbar {
+    box-shadow: 0 2px 15px var(--shadow-color);
+    padding: 0.75rem 1rem;
+}
+
+.navbar-brand {
     font-weight: 700;
     font-size: 1.5rem;
     color: var(--primary-color);
 }
 
-.modern-header .navbar-nav .nav-link {
+.navbar-nav .nav-link {
+    padding: 0.75rem 1rem;
+    color: var(--text-color);
     font-weight: 500;
-    padding: 0.5rem 1rem;
-    color: var(--dark-color);
-    transition: var(--transition);
+    transition: color 0.3s;
 }
 
-.modern-header .navbar-nav .nav-link:hover {
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
     color: var(--primary-color);
 }
 
-/* Hero секция */
+.navbar-nav .nav-link i {
+    margin-right: 0.5rem;
+}
+
+/* Главная страница - Hero секция */
 .hero-section {
-    background: linear-gradient(135deg, #2980b9, #6dd5fa, #ffffff);
-    background-size: cover;
-    background-position: center;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: white;
-    padding: 80px 0;
-    margin-bottom: 50px;
-    position: relative;
+    padding: 5rem 0;
+    margin-bottom: 3rem;
 }
 
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1;
-}
-
-.hero-section .container {
-    position: relative;
-    z-index: 2;
-}
-
-.hero-title {
-    font-size: 2.5rem;
+.hero-section h1 {
+    font-size: 2.8rem;
     font-weight: 700;
-    margin-bottom: 20px;
+    color: white;
+    margin-bottom: 1.5rem;
 }
 
-.hero-subtitle {
-    font-size: 1.2rem;
-    margin-bottom: 30px;
-    font-weight: 300;
+.hero-section p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
 }
 
-/* Карточка поиска */
-.search-card {
-    background-color: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-    padding: 25px;
-    margin-bottom: 30px;
+.hero-image {
+    max-height: 400px;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
 }
 
-.search-card .form-group {
-    margin-bottom: 20px;
-}
-
-.search-card label {
-    font-weight: 500;
-    margin-bottom: 8px;
-    display: block;
-}
-
-.search-card .form-control {
-    border-radius: 6px;
-    border: 1px solid #dee2e6;
-    padding: 12px 15px;
-    font-size: 1rem;
-    transition: var(--transition);
-}
-
-.search-card .form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(0, 168, 255, 0.15);
-}
-
-.search-card .btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    padding: 12px 25px;
-    font-weight: 500;
-    border-radius: 6px;
-    transition: var(--transition);
-}
-
-.search-card .btn-primary:hover {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
-    transform: translateY(-2px);
-}
-
-/* Современные карточки */
+/* Карточки блоков */
 .modern-card {
     background-color: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-    transition: var(--transition);
-    height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s, box-shadow 0.3s;
     border: none;
+    position: relative;
+    overflow: hidden;
 }
 
 .modern-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px var(--shadow-color);
 }
 
-.modern-card .card-header {
-    background-color: transparent;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 20px 25px;
-}
-
-.modern-card .card-body {
-    padding: 25px;
-}
-
-.modern-card .card-title {
-    font-weight: 600;
-    margin-bottom: 15px;
-    color: var(--dark-color);
-}
-
-.modern-card .btn {
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: 500;
-    transition: var(--transition);
-}
-
-.modern-card .btn-outline-primary {
+.modern-card .card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
     color: var(--primary-color);
-    border-color: var(--primary-color);
+    text-align: center;
+    width: 70px;
+    height: 70px;
+    line-height: 70px;
+    border-radius: 50%;
+    background-color: rgba(10, 78, 133, 0.1);
+    margin: 0 auto 1.5rem;
 }
 
-.modern-card .btn-outline-primary:hover {
+.modern-card h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.modern-card p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.modern-card .card-link {
+    display: block;
+    text-align: center;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.modern-card .card-link:hover {
+    color: var(--primary-light);
+}
+
+/* Форма поиска рейсов */
+.search-section {
+    margin: 3rem 0;
+}
+
+.search-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    padding: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.input-group-text {
     background-color: var(--primary-color);
     color: white;
+    border: none;
+    width: 45px;
+    justify-content: center;
 }
 
-.modern-card .btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
+/* Секция статистики */
+.statistics-section {
+    padding: 4rem 0;
 }
 
-.modern-card .btn-primary:hover {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
-    transform: translateY(-2px);
+.counter-box {
+    text-align: center;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    transition: transform 0.3s;
 }
 
-/* Модерн-футер */
-.modern-footer {
-    background-color: #2c3e50;
+.counter-box:hover {
+    transform: translateY(-5px);
+}
+
+.counter-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.counter {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.counter-row.animate .counter {
+    animation: countUp 2s ease-out;
+}
+
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Отзывы */
+.testimonial-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    padding: 2rem;
+    height: 100%;
+}
+
+.testimonial-content {
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-left: 1.5rem;
+    border-left: 4px solid var(--primary-light);
+}
+
+.testimonial-content p {
+    font-style: italic;
+    color: var(--text-color);
+    font-size: 1.1rem;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+}
+
+.testimonial-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    object-fit: cover;
+    border: 3px solid var(--primary-light);
+}
+
+.testimonial-author h5 {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.testimonial-author p {
+    margin-bottom: 0;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Призыв к действию */
+.cta-section {
+    padding: 3rem 0;
+}
+
+.cta-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: white;
-    padding: 30px 0;
-    margin-top: 50px;
+    border-radius: 10px;
+    padding: 3rem;
+    box-shadow: 0 10px 25px var(--shadow-color);
 }
 
-.modern-footer a {
+.cta-card h2 {
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.cta-card p {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Подвал сайта */
+footer {
+    background-color: var(--primary-dark);
     color: rgba(255, 255, 255, 0.8);
+    padding: 3rem 0 2rem;
 }
 
-.modern-footer a:hover {
+footer h5 {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+footer ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+footer ul li {
+    margin-bottom: 0.75rem;
+}
+
+footer ul li a {
+    color: rgba(255, 255, 255, 0.7);
+    transition: color 0.3s;
+}
+
+footer ul li a:hover {
     color: white;
     text-decoration: none;
 }
 
-/* Результаты поиска */
-.flight-results {
-    margin-top: 30px;
-}
-
-.flight-card {
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-shadow);
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    padding: 20px;
-    background-color: white;
-    position: relative;
-    overflow: hidden;
-    transition: var(--transition);
-}
-
-.flight-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-}
-
-.flight-card .airline-logo {
-    flex: 0 0 70px;
-    margin-right: 20px;
-}
-
-.flight-card .flight-times {
-    flex: 1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.flight-card .flight-details {
-    padding: 0 20px;
-    font-size: 0.9rem;
-    color: #666;
-    min-width: 150px;
-}
-
-.flight-card .flight-time {
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.flight-card .flight-duration {
+.footer-bottom {
+    padding-top: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
-    position: relative;
-    padding: 0 20px;
+    font-size: 0.9rem;
 }
 
-.flight-card .flight-duration::before,
-.flight-card .flight-duration::after {
-    content: '';
-    height: 1px;
+.social-icons a {
+    display: inline-block;
     width: 40px;
-    background-color: #ddd;
-    position: absolute;
-    top: 50%;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    margin-right: 0.5rem;
+    transition: all 0.3s;
 }
 
-.flight-card .flight-duration::before {
-    left: -35px;
+.social-icons a:hover {
+    background-color: var(--primary-light);
+    color: white;
+    transform: translateY(-3px);
 }
 
-.flight-card .flight-duration::after {
-    right: -35px;
+/* Хлебные крошки */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0.75rem 0;
+    margin-bottom: 2rem;
 }
 
-.flight-card .flight-price {
-    font-size: 1.8rem;
-    font-weight: 700;
+.breadcrumb-item a {
     color: var(--primary-color);
-    padding: 0 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
-.flight-card .select-btn {
+.breadcrumb-item.active {
+    color: var(--text-light);
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: var(--text-light);
+}
+
+/* Заголовок страницы */
+.page-header {
+    margin-bottom: 2.5rem;
+    position: relative;
+}
+
+.page-header h1 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    color: var(--text-light);
+    font-size: 1.1rem;
+}
+
+/* Таблицы */
+.table {
+    box-shadow: 0 5px 15px var(--shadow-color);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.table thead th {
     background-color: var(--primary-color);
     color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 6px;
+    border-bottom: none;
+    padding: 1rem;
     font-weight: 500;
-    transition: var(--transition);
 }
 
-.flight-card .select-btn:hover {
-    background-color: var(--secondary-color);
-    transform: translateY(-2px);
+.table tbody tr:nth-child(even) {
+    background-color: var(--background-light);
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-top: 1px solid var(--border-color);
+}
+
+.table-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.table-actions a {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.action-view {
+    background-color: var(--info-color);
+}
+
+.action-edit {
+    background-color: var(--warning-color);
+}
+
+.action-delete {
+    background-color: var(--danger-color);
+}
+
+/* Формы */
+.form-section {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.form-control:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 0.2rem rgba(10, 78, 133, 0.25);
 }
 
 /* Адаптивность */
 @media (max-width: 992px) {
-    .flight-card {
-        flex-direction: column;
-        text-align: center;
+    .hero-section {
+        padding: 3rem 0;
     }
     
-    .flight-card .airline-logo {
-        margin-right: 0;
-        margin-bottom: 15px;
+    .hero-section h1 {
+        font-size: 2.2rem;
     }
     
-    .flight-card .flight-times {
-        margin-bottom: 15px;
-    }
-    
-    .flight-card .flight-details {
-        margin-bottom: 15px;
-    }
-    
-    .flight-card .flight-price {
-        margin-bottom: 15px;
+    .cta-card {
+        padding: 2rem;
     }
 }
 
 @media (max-width: 768px) {
-    .hero-section {
-        padding: 60px 0;
+    .hero-section h1 {
+        font-size: 2rem;
     }
     
-    .hero-title {
+    .modern-card, 
+    .search-card, 
+    .counter-box, 
+    .testimonial-card,
+    .cta-card {
+        padding: 1.5rem;
+    }
+    
+    .page-header h1 {
         font-size: 2rem;
     }
 } 

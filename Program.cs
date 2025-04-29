@@ -36,7 +36,7 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         
-        // Удаляем и пересоздаем базу данных для решения проблемы с именами таблиц
+        // Удаляем и пересоздаем базу данных для применения изменений модели
         context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
         

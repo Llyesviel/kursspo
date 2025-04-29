@@ -1,0 +1,63 @@
+@model User
+
+@{
+    ViewData["Title"] = "Редактирование пользователя";
+    Layout = "_AdminLayout";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1>Редактирование пользователя</h1>
+    <div>
+        <a asp-controller="Admin" asp-action="Users" class="admin-btn admin-btn-primary">
+            <i class="fas fa-arrow-left"></i> Назад к списку
+        </a>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h5 class="admin-card-title">Редактирование данных пользователя</h5>
+    </div>
+    <div class="admin-card-body">
+        <form asp-action="EditUser">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="admin-form-group">
+                        <label asp-for="Username" class="control-label">Имя пользователя</label>
+                        <input asp-for="Username" class="admin-form-control" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="admin-form-group">
+                        <label asp-for="Email" class="control-label">Email</label>
+                        <input asp-for="Email" class="admin-form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-form-group">
+                <label asp-for="Role" class="control-label">Роль</label>
+                <select asp-for="Role" class="admin-form-control">
+                    <option value="User">Пользователь</option>
+                    <option value="Admin">Администратор</option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger"></span>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="admin-btn admin-btn-success">
+                    <i class="fas fa-save"></i> Сохранить
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

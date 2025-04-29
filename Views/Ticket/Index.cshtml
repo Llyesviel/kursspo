@@ -4,50 +4,120 @@
     ViewData["Title"] = "Билеты";
 }
 
-<h1>Билеты</h1>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Управление билетами</h1>
+        <div>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Продать билет
+            </a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Список билетов</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>№ билета</th>
+                            <th>Рейс</th>
+                            <th>Источник</th>
+                            <th>Место</th>
+                            <th>Пассажир</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <strong>@item.TicketNumber</strong>
+                                        <small class="text-muted">ID: @item.Id</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <strong>@item.Flight.FlightNumber</strong>
+                                        <small class="text-muted">@item.Flight.DepartureTime.ToString("dd.MM.yyyy HH:mm")</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (item.PurchaseSource == "Online")
+                                    {
+                                        <span class="badge bg-info">Онлайн</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Касса №@item.CashboxNumber</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">@item.SeatNumber</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <div>@(item.PassengerName ?? "Не указано")</div>
+                                        <small class="text-muted">@(item.DocumentNumber ?? "Нет данных")</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <div>@item.Date.ToString("dd.MM.yyyy")</div>
+                                        <small class="text-muted">@item.Time.ToString(@"hh\:mm")</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    @switch(item.Status)
+                                    {
+                                        case "Paid":
+                                            <span class="badge bg-success">Оплачен</span>
+                                            break;
+                                        case "Booked":
+                                            <span class="badge bg-warning text-dark">Забронирован</span>
+                                            break;
+                                        case "CheckedIn":
+                                            <span class="badge bg-primary">Регистрация</span>
+                                            break;
+                                        case "Cancelled":
+                                            <span class="badge bg-danger">Отменен</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary">Неизвестно</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning" title="Изменить">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="Детали">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                        <a href="javascript:void(0);" onclick="showDeleteConfirmation('@Url.Action("Delete", "Ticket", new { id = item.Id })')" class="btn btn-sm btn-danger" title="Удалить">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Продать билет</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                № кассы
-            </th>
-            <th>
-                № рейса
-            </th>
-            <th>
-                Дата
-            </th>
-            <th>
-                Время
-            </th>
-            <th>Действия</th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CashboxNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Flight.FlightNumber)
-            </td>
-            <td>
-                @item.Date.ToString("dd.MM.yyyy")
-            </td>
-            <td>
-                @item.Time.ToString(@"hh\:mm")
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Изменить</a>
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a>
-                <a href="javascript:void(0);" onclick="showDeleteConfirmation('@Url.Action("Delete", "Ticket", new { id = item.Id })')" class="btn btn-sm btn-danger">Удалить</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table> 
+<style>
+    .table th, .table td {
+        vertical-align: middle;
+    }
+</style> 

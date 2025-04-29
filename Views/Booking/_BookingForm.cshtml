@@ -1,0 +1,97 @@
+@model Airport.Controllers.BookingViewModel
+
+<div class="booking-form">
+    <div class="text-center mb-4">
+        <div class="fw-bold fs-4">Бронирование билета</div>
+        <div class="text-muted">Рейс @Model.FlightNumber - @Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</div>
+        <div class="ticket-price mt-2">
+            <span class="fs-5 fw-bold text-primary">@Model.Price ₽</span>
+        </div>
+    </div>
+    
+    <form id="bookingForm" method="post" asp-controller="Booking" asp-action="BookTicket">
+        <input type="hidden" asp-for="FlightId" />
+        <input type="hidden" asp-for="FlightNumber" />
+        <input type="hidden" asp-for="DepartureTime" />
+        <input type="hidden" asp-for="Price" />
+        
+        <div class="mb-3">
+            <label asp-for="PassengerName" class="form-label">ФИО пассажира</label>
+            <input asp-for="PassengerName" class="form-control" required />
+            <span asp-validation-for="PassengerName" class="text-danger"></span>
+        </div>
+        
+        <div class="mb-3">
+            <label asp-for="DocumentNumber" class="form-label">Номер документа (паспорт)</label>
+            <input asp-for="DocumentNumber" class="form-control" required />
+            <span asp-validation-for="DocumentNumber" class="text-danger"></span>
+        </div>
+        
+        <div class="mb-3">
+            <label asp-for="ContactPhone" class="form-label">Контактный телефон</label>
+            <input asp-for="ContactPhone" class="form-control" required placeholder="+7 (xxx) xxx-xx-xx" />
+            <span asp-validation-for="ContactPhone" class="text-danger"></span>
+        </div>
+        
+        <div class="mb-3">
+            <label asp-for="ContactEmail" class="form-label">Email</label>
+            <input asp-for="ContactEmail" type="email" class="form-control" required />
+            <span asp-validation-for="ContactEmail" class="text-danger"></span>
+        </div>
+        
+        <div class="alert alert-info mb-3">
+            <small>
+                <i class="fas fa-info-circle me-2"></i>
+                Место будет назначено автоматически. Билет будет привязан к вашему аккаунту.
+            </small>
+        </div>
+        
+        <div class="form-text mb-3">
+            Стоимость билета будет списана с вашего счета после подтверждения бронирования.
+        </div>
+        
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check-circle me-2"></i> Подтвердить бронирование
+            </button>
+        </div>
+    </form>
+</div>
+
+<div id="bookingSuccess" class="booking-success d-none">
+    <div class="text-center py-4">
+        <div class="success-icon mb-3">
+            <i class="fas fa-check-circle text-success" style="font-size: 64px;"></i>
+        </div>
+        <h4>Билет успешно забронирован!</h4>
+        <p class="text-muted">Информация о билете доступна в разделе "Мои билеты"</p>
+        <div class="mt-4">
+            <a href="/Booking/MyTickets" class="btn btn-primary">
+                <i class="fas fa-ticket-alt me-2"></i> Перейти к моим билетам
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#bookingForm').submit(function(e) {
+            e.preventDefault();
+            
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        $('.booking-form').addClass('d-none');
+                        $('#bookingSuccess').removeClass('d-none');
+                    }
+                },
+                error: function(xhr) {
+                    alert('Ошибка при бронировании: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+</script> 

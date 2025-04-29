@@ -1,0 +1,118 @@
+@model Flight
+
+<div class="flight-details-modal">
+    <div class="text-center mb-4">
+        <div class="fw-bold fs-4">Рейс @Model.FlightNumber</div>
+        <div class="text-muted">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</div>
+    </div>
+    
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="detail-item">
+                <div class="detail-label">Самолет</div>
+                <div class="detail-value">@Model.Aircraft.Name</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="detail-item">
+                <div class="detail-label">Тип самолета</div>
+                <div class="detail-value">@Model.Aircraft.Category</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="detail-item">
+                <div class="detail-label">Свободные места</div>
+                <div class="detail-value">@Model.AvailableSeats из @Model.Aircraft.SeatCount</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="detail-item">
+                <div class="detail-label">Стоимость</div>
+                <div class="detail-value fs-5 fw-bold text-primary">@Model.Price ₽</div>
+            </div>
+        </div>
+    </div>
+    
+    @if (Model.Landings != null && Model.Landings.Any())
+    {
+        <div class="landing-info mt-4">
+            <h5 class="mb-3">Посадки по маршруту</h5>
+            <div class="landing-timeline">
+                @foreach (var landing in Model.Landings.OrderBy(l => l.Time))
+                {
+                    <div class="landing-point">
+                        <div class="landing-time">@landing.Time.ToString("HH:mm")</div>
+                        <div class="landing-marker"></div>
+                        <div class="landing-location">@landing.Location</div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    
+    <div class="text-center mt-4">
+        <button type="button" class="btn btn-primary" onclick="showBookingForm(@Model.Id)">
+            <i class="fas fa-ticket-alt me-2"></i> Забронировать билет
+        </button>
+    </div>
+</div>
+
+<style>
+    .detail-item {
+        margin-bottom: 15px;
+    }
+    
+    .detail-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+    
+    .detail-value {
+        font-weight: 500;
+    }
+    
+    .landing-timeline {
+        position: relative;
+        padding-left: 15px;
+    }
+    
+    .landing-timeline::before {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 0;
+        height: 100%;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+    
+    .landing-point {
+        position: relative;
+        margin-bottom: 20px;
+        padding-left: 20px;
+    }
+    
+    .landing-marker {
+        position: absolute;
+        left: -5px;
+        top: 5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        z-index: 1;
+    }
+    
+    .landing-time {
+        font-weight: 500;
+        margin-bottom: 3px;
+    }
+    
+    .landing-location {
+        color: #6c757d;
+    }
+</style> 

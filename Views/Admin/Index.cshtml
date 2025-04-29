@@ -1,0 +1,183 @@
+@model Airport.Models.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Панель управления";
+    Layout = "_AdminLayout";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1>Панель управления</h1>
+    <div>
+        <a asp-controller="Admin" asp-action="Users" class="admin-btn admin-btn-primary">
+            <i class="fas fa-users"></i> Управление пользователями
+        </a>
+    </div>
+</div>
+
+<div class="admin-stats">
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon blue">
+            <i class="fas fa-plane"></i>
+        </div>
+        <div class="admin-stat-info">
+            <h3 class="admin-stat-value">@Model.TotalAircrafts</h3>
+            <p class="admin-stat-label">Самолетов</p>
+        </div>
+    </div>
+    
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon green">
+            <i class="fas fa-route"></i>
+        </div>
+        <div class="admin-stat-info">
+            <h3 class="admin-stat-value">@Model.TotalFlights</h3>
+            <p class="admin-stat-label">Рейсов</p>
+        </div>
+    </div>
+    
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon orange">
+            <i class="fas fa-ticket-alt"></i>
+        </div>
+        <div class="admin-stat-info">
+            <h3 class="admin-stat-value">@Model.TotalTickets</h3>
+            <p class="admin-stat-label">Билетов</p>
+        </div>
+    </div>
+    
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon red">
+            <i class="fas fa-plane-arrival"></i>
+        </div>
+        <div class="admin-stat-info">
+            <h3 class="admin-stat-value">@Model.TotalLandings</h3>
+            <p class="admin-stat-label">Посадок</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="admin-card mb-4">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title">Последние проданные билеты</h5>
+                <a asp-controller="Ticket" asp-action="Index" class="admin-btn admin-btn-sm admin-btn-primary">Все билеты</a>
+            </div>
+            <div class="admin-card-body p-0">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Касса</th>
+                            <th>Рейс</th>
+                            <th>Дата/Время</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ticket in Model.RecentTickets)
+                        {
+                            <tr>
+                                <td>@ticket.CashboxNumber</td>
+                                <td>@ticket.Flight.FlightNumber</td>
+                                <td>@ticket.Date.ToString("dd.MM.yyyy") @ticket.Time.ToString(@"hh\:mm")</td>
+                                <td>
+                                    <a asp-controller="Ticket" asp-action="Details" asp-route-id="@ticket.Id" class="admin-btn admin-btn-sm admin-btn-primary">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.RecentTickets.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-3">Нет данных</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="admin-card mb-4">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title">Ближайшие рейсы</h5>
+                <a asp-controller="Flight" asp-action="Index" class="admin-btn admin-btn-sm admin-btn-primary">Все рейсы</a>
+            </div>
+            <div class="admin-card-body p-0">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Номер</th>
+                            <th>Самолет</th>
+                            <th>Отправление</th>
+                            <th>Места</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var flight in Model.UpcomingFlights)
+                        {
+                            <tr>
+                                <td>@flight.FlightNumber</td>
+                                <td>@flight.Aircraft.Name</td>
+                                <td>@flight.DepartureTime.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@flight.AvailableSeats / @flight.Aircraft.SeatCount</td>
+                            </tr>
+                        }
+                        @if (!Model.UpcomingFlights.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-3">Нет данных</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title">Быстрый доступ</h5>
+            </div>
+            <div class="admin-card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a asp-controller="Aircraft" asp-action="Create" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-plus-circle mb-2 d-block" style="font-size: 24px;"></i>
+                            Добавить самолет
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a asp-controller="Flight" asp-action="Create" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-plus-circle mb-2 d-block" style="font-size: 24px;"></i>
+                            Добавить рейс
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a asp-controller="Ticket" asp-action="Create" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-plus-circle mb-2 d-block" style="font-size: 24px;"></i>
+                            Продать билет
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a asp-controller="Landing" asp-action="Create" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-plus-circle mb-2 d-block" style="font-size: 24px;"></i>
+                            Добавить посадку
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a asp-controller="Admin" asp-action="CreateDeparture" class="btn btn-outline-primary w-100 py-3">
+                            <i class="fas fa-plus-circle mb-2 d-block" style="font-size: 24px;"></i>
+                            Добавить вылет
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -15,6 +15,7 @@ namespace Airport.Data
         public DbSet<Flight> Flights { get; set; } = null!;
         public DbSet<Landing> Landings { get; set; } = null!;
         public DbSet<Ticket> Tickets { get; set; } = null!;
+        public DbSet<Departure> Departures { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,9 +28,13 @@ namespace Airport.Data
 
             // Явное указание имен таблиц
             modelBuilder.Entity<Aircraft>().ToTable("Aircraft");
-            modelBuilder.Entity<Flight>().ToTable("Flight");
+            modelBuilder.Entity<Flight>()
+                .ToTable("Flight")
+                .Property(f => f.Price)
+                .HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Landing>().ToTable("Landing");
             modelBuilder.Entity<Ticket>().ToTable("Ticket");
+            modelBuilder.Entity<Departure>().ToTable("Departure");
 
             // Конфигурация отношений между моделями
             modelBuilder.Entity<Flight>()
@@ -48,6 +53,12 @@ namespace Airport.Data
                 .HasOne(t => t.Flight)
                 .WithMany(f => f.Tickets)
                 .HasForeignKey(t => t.FlightId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Departure>()
+                .HasOne(d => d.Flight)
+                .WithMany(f => f.Departures)
+                .HasForeignKey(d => d.FlightId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

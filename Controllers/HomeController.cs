@@ -55,26 +55,49 @@ namespace Airport.Controllers
             return View(flights);
         }
 
-        // Отчет о проданных билетах за период
-        public async Task<IActionResult> TicketSalesReport(DateTime startDate, DateTime endDate)
+        // Перенаправление на новую страницу "Мои билеты"
+        public IActionResult MyTickets()
         {
+            return RedirectToAction("MyTickets", "Booking");
+        }
+
+        // Отчет о проданных билетах за период
+        public async Task<IActionResult> TicketSalesReport(DateTime? startDate, DateTime? endDate)
+        {
+            if (!startDate.HasValue)
+            {
+                startDate = DateTime.Today.AddMonths(-1);
+            }
+
+            if (!endDate.HasValue)
+            {
+                endDate = DateTime.Today;
+            }
+
             if (endDate < startDate)
             {
-                endDate = startDate.AddMonths(1);
+                endDate = startDate.Value.AddMonths(1);
             }
 
             var tickets = await _context.Tickets
                 .Include(t => t.Flight)
                 .Include(t => t.Flight.Aircraft)
+                .Include(t => t.Flight.Landings)
                 .Where(t => t.Date >= startDate && t.Date <= endDate)
                 .OrderBy(t => t.Date)
                 .ThenBy(t => t.Time)
                 .ToListAsync();
 
-            ViewBag.StartDate = startDate.ToString("yyyy-MM-dd");
-            ViewBag.EndDate = endDate.ToString("yyyy-MM-dd");
+            ViewBag.StartDate = startDate.Value.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endDate.Value.ToString("yyyy-MM-dd");
             ViewBag.TotalSales = tickets.Sum(t => t.Flight.Price);
             ViewBag.TicketCount = tickets.Count;
+            
+            // Добавляем статистику по типам продаж
+            ViewBag.OnlineTickets = tickets.Count(t => t.PurchaseSource == "Online");
+            ViewBag.OfflineTickets = tickets.Count(t => t.PurchaseSource == "Offline");
+            ViewBag.OnlineSales = tickets.Where(t => t.PurchaseSource == "Online").Sum(t => t.Flight.Price);
+            ViewBag.OfflineSales = tickets.Where(t => t.PurchaseSource == "Offline").Sum(t => t.Flight.Price);
 
             return View(tickets);
         }

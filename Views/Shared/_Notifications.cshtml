@@ -1,0 +1,73 @@
+@using System.Text.Json
+@using Airport.Services
+
+@{
+    if (TempData["Notifications"] != null)
+    {
+        var notifications = JsonSerializer.Deserialize<List<NotificationService.Notification>>(TempData["Notifications"].ToString());
+        
+        if (notifications != null && notifications.Any())
+        {
+            <div class="notifications-container">
+                @foreach (var notification in notifications)
+                {
+                    <div class="alert alert-@notification.GetCssClass() alert-dismissible fade show notification-item" role="alert">
+                        <div class="d-flex align-items-center">
+                            <div class="notification-icon me-3">
+                                <i class="@notification.GetIcon()"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h5 class="alert-heading mb-1 fw-bold">@notification.Title</h5>
+                                <p class="mb-0">@notification.Message</p>
+                            </div>
+                        </div>
+                        @if (notification.IsDismissible)
+                        {
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    }
+}
+
+<style>
+    .notifications-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        max-width: 350px;
+        z-index: 9999;
+    }
+    
+    .notification-item {
+        margin-bottom: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        border: none;
+    }
+    
+    .notification-icon {
+        font-size: 1.5rem;
+    }
+    
+    .notification-content {
+        flex: 1;
+    }
+    
+    .alert-success .notification-icon {
+        color: #27ae60;
+    }
+    
+    .alert-info .notification-icon {
+        color: #3498db;
+    }
+    
+    .alert-warning .notification-icon {
+        color: #f39c12;
+    }
+    
+    .alert-danger .notification-icon {
+        color: #e74c3c;
+    }
+</style> 

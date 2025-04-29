@@ -2,14 +2,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Airport.Data;
 using Airport.Models;
+using Airport.Services;
 
 namespace Airport.Controllers
 {
-    public class AircraftController : Controller
+    public class AircraftController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
-        public AircraftController(ApplicationDbContext context)
+        public AircraftController(ApplicationDbContext context, NotificationService notificationService)
+            : base(notificationService)
         {
             _context = context;
         }
@@ -29,7 +31,9 @@ namespace Airport.Controllers
             }
 
             var aircraft = await _context.Aircrafts
+                .Include(a => a.Flights)
                 .FirstOrDefaultAsync(m => m.Id == id);
+                
             if (aircraft == null)
             {
                 return NotFound();
@@ -53,6 +57,8 @@ namespace Airport.Controllers
             {
                 _context.Add(aircraft);
                 await _context.SaveChangesAsync();
+                
+                AddNotification("Успешно!", "Самолет успешно добавлен.", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index));
             }
             return View(aircraft);
@@ -90,6 +96,8 @@ namespace Airport.Controllers
                 {
                     _context.Update(aircraft);
                     await _context.SaveChangesAsync();
+                    
+                    AddNotification("Успешно!", "Самолет успешно обновлен.", NotificationService.NotificationType.Success);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -117,6 +125,7 @@ namespace Airport.Controllers
 
             var aircraft = await _context.Aircrafts
                 .FirstOrDefaultAsync(m => m.Id == id);
+                
             if (aircraft == null)
             {
                 return NotFound();
@@ -127,25 +136,12 @@ namespace Airport.Controllers
             {
                 _context.Aircrafts.Remove(aircraft);
                 await _context.SaveChangesAsync();
+                
+                AddNotification("Успешно!", "Самолет успешно удален.", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index));
             }
 
             return View(aircraft);
-        }
-
-        // POST: Aircraft/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var aircraft = await _context.Aircrafts.FindAsync(id);
-            if (aircraft != null)
-            {
-                _context.Aircrafts.Remove(aircraft);
-                await _context.SaveChangesAsync();
-            }
-            
-            return RedirectToAction(nameof(Index));
         }
 
         private bool AircraftExists(int id)

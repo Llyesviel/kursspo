@@ -18,6 +18,22 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <ul class="nav nav-pills justify-content-center">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Дешевле</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Быстрее</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Больше</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
     @if (Model.Any())
     {
         <div class="flight-results">
@@ -54,11 +70,11 @@
                     <div class="flight-price">
                         <div>@item.Price ₽</div>
                         <div class="d-flex mt-2 gap-2">
-                            <a asp-controller="Flight" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                            <a href="#" class="btn btn-sm btn-outline-primary" onclick="showFlightDetails(@item.Id); return false;">
                                 <i class="fas fa-info-circle"></i> Детали
                             </a>
-                            <a asp-controller="Ticket" asp-action="Create" asp-route-flightId="@item.Id" class="select-btn">
-                                <i class="fas fa-ticket-alt"></i> Оформить билет
+                            <a href="#" class="select-btn" onclick="showBookingForm(@item.Id); return false;">
+                                <i class="fas fa-ticket-alt"></i> Забронировать билет
                             </a>
                         </div>
                     </div>
@@ -75,4 +91,88 @@
             <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-2">Вернуться к поиску</a>
         </div>
     }
-</div> 
+</div>
+
+<!-- Модальное окно с деталями рейса -->
+<div class="modal fade" id="flightDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Информация о рейсе</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="flightDetailsContent">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно бронирования -->
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Бронирование билета</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="bookingContent">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showFlightDetails(flightId) {
+            var modal = new bootstrap.Modal(document.getElementById('flightDetailsModal'));
+            modal.show();
+            
+            // AJAX запрос для получения деталей рейса
+            $.ajax({
+                url: '/Booking/GetFlightDetails/' + flightId,
+                type: 'GET',
+                success: function(response) {
+                    document.getElementById('flightDetailsContent').innerHTML = response;
+                },
+                error: function() {
+                    document.getElementById('flightDetailsContent').innerHTML = `
+                        <div class="alert alert-danger m-3">
+                            Ошибка при загрузке информации о рейсе.
+                        </div>
+                    `;
+                }
+            });
+        }
+        
+        function showBookingForm(flightId) {
+            var modal = new bootstrap.Modal(document.getElementById('bookingModal'));
+            modal.show();
+            
+            // AJAX запрос для получения формы бронирования
+            $.ajax({
+                url: '/Booking/BookingForm?flightId=' + flightId,
+                type: 'GET',
+                success: function(response) {
+                    document.getElementById('bookingContent').innerHTML = response;
+                },
+                error: function(xhr) {
+                    document.getElementById('bookingContent').innerHTML = `
+                        <div class="alert alert-danger m-3">
+                            Ошибка: ${xhr.responseText || 'Не удалось загрузить форму бронирования'}
+                        </div>
+                    `;
+                }
+            });
+        }
+    </script>
+} 

@@ -4,78 +4,147 @@
     ViewData["Title"] = "Отчет о загруженности рейсов";
 }
 
-<h1>Отчет о загруженности рейсов</h1>
-<h4>На дату: @DateTime.Today.ToString("dd.MM.yyyy")</h4>
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2">Отчет о загруженности рейсов</h1>
+            <p class="text-muted">На дату: @DateTime.Today.ToString("dd.MM.yyyy")</p>
+        </div>
+        <div>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> На главную
+            </a>
+        </div>
+    </div>
 
-<div class="mb-3">
-    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">На главную</a>
-</div>
-
-@if (Model.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>№ рейса</th>
-                <th>Самолет</th>
-                <th>Время вылета</th>
-                <th>Загруженность</th>
-                <th>Свободные места</th>
-                <th>Цена</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.FlightNumber</td>
-                    <td>@item.Aircraft.Name</td>
-                    <td>@item.DepartureTime.ToString("dd.MM.yyyy HH:mm")</td>
-                    <td>
-                        <div class="progress">
-                            <div class="progress-bar @GetProgressBarClass(item.LoadPercentage)" 
-                                 role="progressbar" 
-                                 style="width: @item.LoadPercentage%;" 
-                                 aria-valuenow="@item.LoadPercentage" 
-                                 aria-valuemin="0" 
-                                 aria-valuemax="100">
-                                @item.LoadPercentage%
+    @if (Model.Any())
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>№ рейса</th>
+                                <th>Самолет</th>
+                                <th>Время вылета</th>
+                                <th style="width: 30%;">Загруженность</th>
+                                <th>Места</th>
+                                <th>Цена</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var soldSeats = item.Aircraft.SeatCount - item.AvailableSeats;
+                                var soldPercentage = (int)Math.Round((double)soldSeats / item.Aircraft.SeatCount * 100);
+                                var availablePercentage = 100 - soldPercentage;
+                                
+                                <tr>
+                                    <td><strong>@item.FlightNumber</strong></td>
+                                    <td>@item.Aircraft.Name</td>
+                                    <td>@item.DepartureTime.ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td>
+                                        <div class="load-details mb-1 small">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Продано: @soldSeats из @item.Aircraft.SeatCount (@soldPercentage%)</span>
+                                                <span>Свободно: @item.AvailableSeats (@availablePercentage%)</span>
+                                            </div>
+                                        </div>
+                                        <div class="progress" style="height: 25px;">
+                                            <div class="progress-bar bg-primary" 
+                                                role="progressbar" 
+                                                style="width: @soldPercentage%;" 
+                                                aria-valuenow="@soldPercentage" 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="100">
+                                                @if (soldPercentage > 10)
+                                                {
+                                                    <span>@soldPercentage%</span>
+                                                }
+                                            </div>
+                                            <div class="progress-bar bg-light text-dark" 
+                                                role="progressbar" 
+                                                style="width: @availablePercentage%;" 
+                                                aria-valuenow="@availablePercentage" 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="100">
+                                                @if (availablePercentage > 10)
+                                                {
+                                                    <span>@availablePercentage%</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="text-success">@item.AvailableSeats свободно</span>
+                                            <small class="text-muted">из @item.Aircraft.SeatCount мест</small>
+                                        </div>
+                                    </td>
+                                    <td>@item.Price.ToString("N0") ₽</td>
+                                    <td>
+                                        @if (item.AvailableSeats > 0)
+                                        {
+                                            <a asp-controller="Ticket" asp-action="Create" asp-route-flightId="@item.Id" class="btn btn-sm btn-success">
+                                                <i class="fas fa-ticket-alt me-1"></i> Продать билет
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Нет мест</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Легенда -->
+        <div class="mt-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Легенда</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="progress-sample bg-primary me-2"></div>
+                                <span>Проданные билеты</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="progress-sample bg-light border me-2"></div>
+                                <span>Свободные места</span>
                             </div>
                         </div>
-                    </td>
-                    <td>@item.AvailableSeats из @item.Aircraft.SeatCount</td>
-                    <td>@item.Price.ToString("C")</td>
-                    <td>
-                        @if (item.AvailableSeats > 0)
-                        {
-                            <a asp-controller="Ticket" asp-action="Create" asp-route-flightId="@item.Id" class="btn btn-sm btn-success">Продать билет</a>
-                        }
-                        else
-                        {
-                            <span class="badge bg-danger">Нет мест</span>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-info">
-        Нет активных рейсов.
-    </div>
-}
-
-@functions {
-    public string GetProgressBarClass(int percentage)
-    {
-        if (percentage >= 80)
-            return "bg-danger";
-        else if (percentage >= 50)
-            return "bg-warning";
-        else
-            return "bg-success";
+                        <div class="col-md-6">
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Рейсы с загруженностью более 80% выделяются в отчетах как высоко востребованные.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
-} 
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Нет активных рейсов.
+        </div>
+    }
+</div>
+
+<style>
+    .progress-sample {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        border-radius: 4px;
+    }
+</style> 

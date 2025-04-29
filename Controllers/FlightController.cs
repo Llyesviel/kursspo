@@ -3,14 +3,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Airport.Data;
 using Airport.Models;
+using Airport.Services;
 
 namespace Airport.Controllers
 {
-    public class FlightController : Controller
+    public class FlightController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
-        public FlightController(ApplicationDbContext context)
+        public FlightController(ApplicationDbContext context, NotificationService notificationService)
+            : base(notificationService)
         {
             _context = context;
         }
@@ -45,9 +47,9 @@ namespace Airport.Controllers
         }
 
         // GET: Flight/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["AircraftId"] = new SelectList(_context.Aircrafts, "Id", "Name");
+            ViewBag.AircraftId = new SelectList(await _context.Aircrafts.ToListAsync(), "Id", "Name");
             return View();
         }
 
@@ -56,7 +58,22 @@ namespace Airport.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,FlightNumber,AircraftId,DepartureTime,AvailableSeats,Price")] Flight flight)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+            {
+                foreach (var state in ModelState)
+                {
+                    foreach (var error in state.Value.Errors)
+                    {
+                        AddNotification("Ошибка валидации", 
+                            $"Поле {state.Key}: {error.ErrorMessage}", 
+                            NotificationService.NotificationType.Error);
+                    }
+                }
+                ViewBag.AircraftId = new SelectList(await _context.Aircrafts.ToListAsync(), "Id", "Name", flight.AircraftId);
+                return View(flight);
+            }
+
+            try
             {
                 // Устанавливаем количество свободных мест равным количеству мест в самолете
                 var aircraft = await _context.Aircrafts.FindAsync(flight.AircraftId);
@@ -66,11 +83,17 @@ namespace Airport.Controllers
                 }
 
                 _context.Add(flight);
-                await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
+                AddNotification("Отладка", $"Строк изменено: {result}", NotificationService.NotificationType.Info);
+                AddNotification("Успешно", "Рейс успешно создан", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AircraftId"] = new SelectList(_context.Aircrafts, "Id", "Name", flight.AircraftId);
-            return View(flight);
+            catch (Exception ex)
+            {
+                AddNotification("Ошибка", $"Не удалось сохранить: {ex.Message}", NotificationService.NotificationType.Error);
+                ViewBag.AircraftId = new SelectList(await _context.Aircrafts.ToListAsync(), "Id", "Name", flight.AircraftId);
+                return View(flight);
+            }
         }
 
         // GET: Flight/Edit/5
@@ -81,12 +104,14 @@ namespace Airport.Controllers
                 return NotFound();
             }
 
-            var flight = await _context.Flights.FindAsync(id);
+            var flight = await _context.Flights
+                .Include(f => f.Aircraft)
+                .FirstOrDefaultAsync(f => f.Id == id);
             if (flight == null)
             {
                 return NotFound();
             }
-            ViewData["AircraftId"] = new SelectList(_context.Aircrafts, "Id", "Name", flight.AircraftId);
+            ViewBag.AircraftId = new SelectList(await _context.Aircrafts.ToListAsync(), "Id", "Name", flight.AircraftId);
             return View(flight);
         }
 
@@ -100,28 +125,61 @@ namespace Airport.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
+                foreach (var state in ModelState)
                 {
-                    _context.Update(flight);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!FlightExists(flight.Id))
+                    foreach (var error in state.Value.Errors)
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        AddNotification("Ошибка валидации", 
+                            $"Поле {state.Key}: {error.ErrorMessage}", 
+                            NotificationService.NotificationType.Error);
                     }
                 }
+                ViewBag.AircraftId = new SelectList(await _context.Aircrafts.ToListAsync(), "Id", "Name", flight.AircraftId);
+                return View(flight);
+            }
+
+            try
+            {
+                var existingFlight = await _context.Flights
+                    .Include(f => f.Aircraft)
+                    .FirstOrDefaultAsync(f => f.Id == id);
+
+                if (existingFlight == null)
+                {
+                    return NotFound();
+                }
+
+                existingFlight.FlightNumber = flight.FlightNumber;
+                existingFlight.AircraftId = flight.AircraftId;
+                existingFlight.DepartureTime = flight.DepartureTime;
+                existingFlight.AvailableSeats = flight.AvailableSeats;
+                existingFlight.Price = flight.Price;
+
+                _context.Update(existingFlight);
+                var result = await _context.SaveChangesAsync();
+                AddNotification("Отладка", $"Строк изменено: {result}", NotificationService.NotificationType.Info);
+                AddNotification("Успешно", "Рейс успешно обновлен", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AircraftId"] = new SelectList(_context.Aircrafts, "Id", "Name", flight.AircraftId);
-            return View(flight);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!FlightExists(flight.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                AddNotification("Ошибка", $"Не удалось сохранить: {ex.Message}", NotificationService.NotificationType.Error);
+                ViewBag.AircraftId = new SelectList(await _context.Aircrafts.ToListAsync(), "Id", "Name", flight.AircraftId);
+                return View(flight);
+            }
         }
 
         // GET: Flight/Delete/5
@@ -145,6 +203,7 @@ namespace Airport.Controllers
             {
                 _context.Flights.Remove(flight);
                 await _context.SaveChangesAsync();
+                AddNotification("Успешно", "Рейс успешно удален", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index));
             }
 

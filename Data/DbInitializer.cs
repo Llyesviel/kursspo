@@ -23,7 +23,17 @@ namespace Airport.Data
                     Role = "Admin"
                 };
                 
+                // Добавляем еще одного обычного пользователя
+                var regularUser = new User
+                {
+                    Username = "user",
+                    Email = "user@example.com",
+                    PasswordHash = HashPassword("user123"),
+                    Role = "User"
+                };
+                
                 context.Users.Add(user);
+                context.Users.Add(regularUser);
                 context.SaveChanges();
             }
 
@@ -99,17 +109,65 @@ namespace Airport.Data
                 {
                     new Ticket 
                     { 
-                        CashboxNumber = "К1", 
+                        TicketNumber = GenerateTicketNumber(),
+                        CashboxNumber = "1", 
                         FlightId = flights[0].Id, 
                         Date = DateTime.Today, 
-                        Time = DateTime.Now.TimeOfDay
+                        Time = DateTime.Now.TimeOfDay,
+                        SeatNumber = "12A",
+                        PassengerName = "Иванов Иван Иванович",
+                        DocumentNumber = "4509 123456",
+                        ContactPhone = "+7 (900) 123-45-67",
+                        ContactEmail = "ivanov@example.com",
+                        PurchaseSource = "Offline",
+                        Status = "Paid"
                     },
                     new Ticket 
                     { 
-                        CashboxNumber = "К2", 
+                        TicketNumber = GenerateTicketNumber(),
+                        CashboxNumber = "2", 
                         FlightId = flights[1].Id, 
                         Date = DateTime.Today, 
-                        Time = DateTime.Now.TimeOfDay
+                        Time = DateTime.Now.TimeOfDay,
+                        SeatNumber = "15B",
+                        PassengerName = "Петров Петр Петрович",
+                        DocumentNumber = "4510 789012",
+                        ContactPhone = "+7 (900) 765-43-21",
+                        ContactEmail = "petrov@example.com",
+                        PurchaseSource = "Offline",
+                        Status = "Paid"
+                    },
+                    new Ticket 
+                    { 
+                        TicketNumber = GenerateTicketNumber(),
+                        CashboxNumber = "0", 
+                        FlightId = flights[0].Id, 
+                        Date = DateTime.Today, 
+                        Time = DateTime.Now.TimeOfDay,
+                        SeatNumber = "14C",
+                        PassengerName = "Сидоров Сидор Сидорович",
+                        DocumentNumber = "4511 246810",
+                        ContactPhone = "+7 (900) 111-22-33",
+                        ContactEmail = "sidorov@example.com",
+                        PurchaseSource = "Online",
+                        Status = "Paid",
+                        UserId = 2 // ID обычного пользователя
+                    },
+                    new Ticket 
+                    { 
+                        TicketNumber = GenerateTicketNumber(),
+                        CashboxNumber = "0", 
+                        FlightId = flights[2].Id, 
+                        Date = DateTime.Today, 
+                        Time = DateTime.Now.TimeOfDay,
+                        SeatNumber = "21A",
+                        PassengerName = "Александров Александр Александрович",
+                        DocumentNumber = "4512 135790",
+                        ContactPhone = "+7 (900) 444-55-66",
+                        ContactEmail = "alex@example.com",
+                        PurchaseSource = "Online",
+                        Status = "Booked",
+                        UserId = 2 // ID обычного пользователя
                     }
                 };
 
@@ -136,6 +194,24 @@ namespace Airport.Data
                 var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return Convert.ToBase64String(hashedBytes);
             }
+        }
+        
+        // Метод для генерации уникального номера билета
+        private static string GenerateTicketNumber()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            
+            string part1 = new string(Enumerable.Repeat(chars, 4)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+                
+            string part2 = new string(Enumerable.Repeat(chars, 4)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+                
+            string part3 = new string(Enumerable.Repeat(chars, 4)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+                
+            return $"{part1}-{part2}-{part3}";
         }
     }
 } 

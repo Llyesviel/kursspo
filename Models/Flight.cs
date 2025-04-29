@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Airport.Models
 {
     public class Flight
@@ -15,9 +19,10 @@ namespace Airport.Models
         public Aircraft Aircraft { get; set; } = null!;
         public ICollection<Landing> Landings { get; set; } = new List<Landing>();
         public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+        public ICollection<Departure> Departures { get; set; } = new List<Departure>();
 
         // Процент загруженности рейса (не сохраняется в базу данных)
-        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        [NotMapped]
         public int LoadPercentage { get; set; }
     }
 } 

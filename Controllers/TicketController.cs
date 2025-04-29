@@ -3,14 +3,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Airport.Data;
 using Airport.Models;
+using Airport.Services;
 
 namespace Airport.Controllers
 {
-    public class TicketController : Controller
+    public class TicketController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
-        public TicketController(ApplicationDbContext context)
+        public TicketController(ApplicationDbContext context, NotificationService notificationService)
+            : base(notificationService)
         {
             _context = context;
         }
@@ -75,7 +77,7 @@ namespace Airport.Controllers
         // POST: Ticket/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CashboxNumber,FlightId,Date,Time")] Ticket ticket)
+        public async Task<IActionResult> Create([Bind("Id,CashboxNumber,FlightId,Date,Time,SeatNumber,PassengerName,DocumentNumber,ContactPhone,ContactEmail")] Ticket ticket)
         {
             if (ModelState.IsValid)
             {
@@ -87,6 +89,19 @@ namespace Airport.Controllers
                     return View(ticket);
                 }
 
+                // Генерируем уникальный номер билета
+                ticket.TicketNumber = GenerateTicketNumber();
+                
+                // Если место не указано, генерируем случайное
+                if (string.IsNullOrEmpty(ticket.SeatNumber))
+                {
+                    ticket.SeatNumber = GenerateRandomSeat();
+                }
+                
+                // Устанавливаем источник покупки и статус
+                ticket.PurchaseSource = "Offline";
+                ticket.Status = "Paid";
+
                 // Уменьшаем количество свободных мест
                 flight.AvailableSeats--;
                 _context.Update(flight);
@@ -94,6 +109,7 @@ namespace Airport.Controllers
                 // Добавляем билет
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
+                AddNotification("Успешно", "Билет успешно создан", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -184,6 +200,7 @@ namespace Airport.Controllers
 
                     _context.Update(ticket);
                     await _context.SaveChangesAsync();
+                    AddNotification("Успешно", "Билет успешно обновлен", NotificationService.NotificationType.Success);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -238,6 +255,7 @@ namespace Airport.Controllers
 
                 _context.Tickets.Remove(ticket);
                 await _context.SaveChangesAsync();
+                AddNotification("Успешно", "Билет успешно удален", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -247,6 +265,33 @@ namespace Airport.Controllers
         private bool TicketExists(int id)
         {
             return _context.Tickets.Any(e => e.Id == id);
+        }
+
+        // Вспомогательный метод для генерации случайного места
+        private string GenerateRandomSeat()
+        {
+            var random = new Random();
+            int row = random.Next(1, 30);
+            char seat = (char)('A' + random.Next(0, 6)); // A-F
+            return $"{row}{seat}";
+        }
+
+        // Метод для генерации уникального номера билета
+        private string GenerateTicketNumber()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            
+            string part1 = new string(Enumerable.Repeat(chars, 4)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        
+            string part2 = new string(Enumerable.Repeat(chars, 4)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        
+            string part3 = new string(Enumerable.Repeat(chars, 4)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        
+            return $"{part1}-{part2}-{part3}";
         }
     }
 } 

@@ -1,0 +1,154 @@
+@model IEnumerable<Ticket>
+
+@{
+    ViewData["Title"] = "Мои билеты";
+}
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-3">Мои билеты</h1>
+        </div>
+        <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+            <a asp-controller="Home" asp-action="SearchFlights" class="btn btn-outline-primary">
+                <i class="fas fa-search"></i> Найти новый рейс
+            </a>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var ticket in Model)
+            {
+                <div class="col-md-6 mb-4">
+                    <div class="card ticket-card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-primary me-2">Билет #@ticket.Id</span>
+                                <span class="small text-muted">@ticket.TicketNumber</span>
+                            </div>
+                            <span class="badge @(ticket.Status == "Paid" ? "bg-success" : "bg-warning")">
+                                @(ticket.Status == "Paid" ? "Оплачен" : "Забронирован")
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="flight-info mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="flight-number fw-bold">Рейс @ticket.Flight.FlightNumber</div>
+                                    <div class="flight-price text-primary fw-bold">@ticket.Flight.Price ₽</div>
+                                </div>
+                                <div class="departure-info mb-3">
+                                    <div><i class="fas fa-plane-departure me-2 text-muted"></i> @ticket.Flight.DepartureTime.ToString("dd.MM.yyyy HH:mm")</div>
+                                    <div><i class="fas fa-plane me-2 text-muted"></i> @ticket.Flight.Aircraft.Name</div>
+                                </div>
+                                <div class="seat-info d-flex align-items-center bg-light p-2 rounded mb-3">
+                                    <div class="seat-badge me-3">
+                                        <i class="fas fa-chair text-primary" style="font-size: 24px;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small text-muted">Ваше место</div>
+                                        <div class="fw-bold">@ticket.SeatNumber</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="passenger-info">
+                                <h6 class="text-muted mb-2">Информация о пассажире</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <div class="small text-muted">ФИО</div>
+                                            <div>@(ticket.PassengerName ?? "Не указано")</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <div class="small text-muted">Документ</div>
+                                            <div>@(ticket.DocumentNumber ?? "Не указано")</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <div class="small text-muted">Телефон</div>
+                                            <div>@(ticket.ContactPhone ?? "Не указано")</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <div class="small text-muted">Email</div>
+                                            <div>@(ticket.ContactEmail ?? "Не указано")</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <div class="small text-muted">
+                                Дата покупки: @ticket.Date.ToString("dd.MM.yyyy") @ticket.Time.ToString("HH:mm")
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" onclick="printTicket('@ticket.TicketNumber')">
+                                <i class="fas fa-print"></i> Печать
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info p-4 text-center">
+            <i class="fas fa-ticket-alt fa-3x mb-3"></i>
+            <h4>У вас пока нет билетов</h4>
+            <p>Когда вы забронируете билеты, они появятся здесь.</p>
+            <a asp-controller="Home" asp-action="SearchFlights" class="btn btn-primary mt-2">Найти рейс</a>
+        </div>
+    }
+</div>
+
+<style>
+    .ticket-card {
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .ticket-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .ticket-card .card-header {
+        background-color: white;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .ticket-card .flight-number {
+        font-size: 1.1rem;
+    }
+    
+    .ticket-card .flight-price {
+        font-size: 1.2rem;
+    }
+    
+    .ticket-card .passenger-info {
+        padding-top: 15px;
+        border-top: 1px dashed #eee;
+    }
+    
+    .seat-info {
+        border-left: 3px solid var(--primary-color);
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function printTicket(ticketNumber) {
+            // В реальном приложении здесь должен быть код для печати билета
+            alert(`Подготовка билета ${ticketNumber} к печати...`);
+        }
+    </script>
+} 

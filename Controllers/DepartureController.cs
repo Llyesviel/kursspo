@@ -7,17 +7,17 @@ using Airport.Services;
 
 namespace Airport.Controllers
 {
-    public class LandingController : BaseController
+    public class DepartureController : BaseController
     {
         private readonly ApplicationDbContext _context;
 
-        public LandingController(ApplicationDbContext context, NotificationService notificationService)
+        public DepartureController(ApplicationDbContext context, NotificationService notificationService)
             : base(notificationService)
         {
             _context = context;
         }
 
-        // GET: Landing
+        // GET: Departure
         public async Task<IActionResult> Index(int? flightId)
         {
             if (flightId.HasValue)
@@ -34,36 +34,36 @@ namespace Airport.Controllers
                 ViewBag.FlightInfo = $"Рейс {flight.FlightNumber} ({flight.Aircraft.Name})";
                 ViewBag.FlightId = flightId;
                 
-                var landings = await _context.Landings
-                    .Where(l => l.FlightId == flightId)
-                    .OrderBy(l => l.Time)
+                var departures = await _context.Departures
+                    .Where(d => d.FlightId == flightId)
+                    .OrderBy(d => d.Time)
                     .ToListAsync();
                 
-                return View(landings);
+                return View(departures);
             }
             else
             {
-                var landings = await _context.Landings
-                    .Include(l => l.Flight)
-                    .OrderBy(l => l.Flight.FlightNumber)
-                    .ThenBy(l => l.Time)
+                var departures = await _context.Departures
+                    .Include(d => d.Flight)
+                    .OrderBy(d => d.Flight.FlightNumber)
+                    .ThenBy(d => d.Time)
                     .ToListAsync();
                 
-                return View(landings);
+                return View(departures);
             }
         }
 
-        // GET: Landing/Create
+        // GET: Departure/Create
         public async Task<IActionResult> Create()
         {
             ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber");
             return View();
         }
 
-        // POST: Landing/Create
+        // POST: Departure/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Location,Time,FlightId")] Landing landing)
+        public async Task<IActionResult> Create([Bind("Id,Location,Time,FlightId")] Departure departure)
         {
             if (!ModelState.IsValid)
             {
@@ -76,27 +76,27 @@ namespace Airport.Controllers
                             NotificationService.NotificationType.Error);
                     }
                 }
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", landing.FlightId);
-                return View(landing);
+                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", departure.FlightId);
+                return View(departure);
             }
 
             try
             {
-                _context.Add(landing);
+                _context.Add(departure);
                 var result = await _context.SaveChangesAsync();
                 AddNotification("Отладка", $"Строк изменено: {result}", NotificationService.NotificationType.Info);
-                AddNotification("Успешно", "Посадка успешно создана", NotificationService.NotificationType.Success);
-                return RedirectToAction(nameof(Index), new { flightId = landing.FlightId });
+                AddNotification("Успешно", "Вылет успешно создан", NotificationService.NotificationType.Success);
+                return RedirectToAction(nameof(Index), new { flightId = departure.FlightId });
             }
             catch (Exception ex)
             {
                 AddNotification("Ошибка", $"Не удалось сохранить: {ex.Message}", NotificationService.NotificationType.Error);
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", landing.FlightId);
-                return View(landing);
+                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", departure.FlightId);
+                return View(departure);
             }
         }
 
-        // GET: Landing/Edit/5
+        // GET: Departure/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -104,21 +104,21 @@ namespace Airport.Controllers
                 return NotFound();
             }
 
-            var landing = await _context.Landings.FindAsync(id);
-            if (landing == null)
+            var departure = await _context.Departures.FindAsync(id);
+            if (departure == null)
             {
                 return NotFound();
             }
-            ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", landing.FlightId);
-            return View(landing);
+            ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
+            return View(departure);
         }
 
-        // POST: Landing/Edit/5
+        // POST: Departure/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Location,Time,FlightId")] Landing landing)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Location,Time,FlightId")] Departure departure)
         {
-            if (id != landing.Id)
+            if (id != departure.Id)
             {
                 return NotFound();
             }
@@ -134,21 +134,21 @@ namespace Airport.Controllers
                             NotificationService.NotificationType.Error);
                     }
                 }
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", landing.FlightId);
-                return View(landing);
+                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", departure.FlightId);
+                return View(departure);
             }
 
             try
             {
-                _context.Update(landing);
+                _context.Update(departure);
                 var result = await _context.SaveChangesAsync();
                 AddNotification("Отладка", $"Строк изменено: {result}", NotificationService.NotificationType.Info);
-                AddNotification("Успешно", "Посадка успешно обновлена", NotificationService.NotificationType.Success);
-                return RedirectToAction(nameof(Index), new { flightId = landing.FlightId });
+                AddNotification("Успешно", "Вылет успешно обновлен", NotificationService.NotificationType.Success);
+                return RedirectToAction(nameof(Index), new { flightId = departure.FlightId });
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!LandingExists(landing.Id))
+                if (!DepartureExists(departure.Id))
                 {
                     return NotFound();
                 }
@@ -160,12 +160,12 @@ namespace Airport.Controllers
             catch (Exception ex)
             {
                 AddNotification("Ошибка", $"Не удалось сохранить: {ex.Message}", NotificationService.NotificationType.Error);
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", landing.FlightId);
-                return View(landing);
+                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", departure.FlightId);
+                return View(departure);
             }
         }
 
-        // GET: Landing/Delete/5
+        // GET: Departure/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -173,10 +173,10 @@ namespace Airport.Controllers
                 return NotFound();
             }
 
-            var landing = await _context.Landings
-                .Include(l => l.Flight)
+            var departure = await _context.Departures
+                .Include(d => d.Flight)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (landing == null)
+            if (departure == null)
             {
                 return NotFound();
             }
@@ -184,9 +184,9 @@ namespace Airport.Controllers
             // Если запрос был отправлен с использованием POST, удаляем объект
             if (Request.Method == "POST")
             {
-                _context.Landings.Remove(landing);
+                _context.Departures.Remove(departure);
                 await _context.SaveChangesAsync();
-                AddNotification("Успешно", "Посадка успешно удалена", NotificationService.NotificationType.Success);
+                AddNotification("Успешно", "Вылет успешно удален", NotificationService.NotificationType.Success);
                 
                 if (Request.Query.ContainsKey("flightId"))
                 {
@@ -195,12 +195,12 @@ namespace Airport.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(landing);
+            return View(departure);
         }
 
-        private bool LandingExists(int id)
+        private bool DepartureExists(int id)
         {
-            return _context.Landings.Any(e => e.Id == id);
+            return _context.Departures.Any(e => e.Id == id);
         }
     }
 } 
