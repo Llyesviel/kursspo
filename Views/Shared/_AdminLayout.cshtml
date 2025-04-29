@@ -58,7 +58,7 @@
                 </a>
             </li>
             <li class="admin-menu-item">
-                <a asp-controller="Admin" asp-action="Departures" class="admin-menu-link @(ViewContext.RouteData.Values["Action"].ToString() == "Departures" ? "active" : "")">
+                <a asp-controller="Departure" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Departure" ? "active" : "")">
                     <i class="fas fa-plane-departure"></i> Вылеты
                 </a>
             </li>

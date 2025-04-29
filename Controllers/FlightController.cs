@@ -37,6 +37,7 @@ namespace Airport.Controllers
             var flight = await _context.Flights
                 .Include(f => f.Aircraft)
                 .Include(f => f.Landings)
+                .Include(f => f.Departures)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (flight == null)
             {

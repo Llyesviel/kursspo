@@ -1,0 +1,38 @@
+@model Departure
+
+@{
+    ViewData["Title"] = "Удаление вылета";
+}
+
+<h1>Удаление вылета</h1>
+
+<h3>Вы уверены, что хотите удалить этот вылет?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            Рейс
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Flight.FlightNumber)
+        </dd>
+        <dt class="col-sm-3">
+            Место вылета
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Location)
+        </dd>
+        <dt class="col-sm-3">
+            Время вылета
+        </dt>
+        <dd class="col-sm-9">
+            @Model.Time.ToString("HH:mm")
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Удалить" class="btn btn-danger" />
+        <a asp-action="Index" asp-route-flightId="@Model.FlightId" class="btn btn-secondary">Назад к списку</a>
+    </form>
+</div> 

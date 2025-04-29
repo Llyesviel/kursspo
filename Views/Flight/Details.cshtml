@@ -51,6 +51,7 @@
 <div class="mb-3">
     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a>
     <a asp-controller="Landing" asp-action="Index" asp-route-flightId="@Model.Id" class="btn btn-info">Управление посадками</a>
+    <a asp-controller="Departure" asp-action="Index" asp-route-flightId="@Model.Id" class="btn btn-info">Управление вылетами</a>
     <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
 </div>
     
@@ -89,5 +90,43 @@ else
     <div class="alert alert-info">
         <p>У этого рейса нет посадок.</p>
         <a asp-controller="Landing" asp-action="Create" asp-route-flightId="@Model.Id" class="btn btn-primary">Добавить посадку</a>
+    </div>
+}
+
+@if (Model.Departures != null && Model.Departures.Any())
+{
+    <h4>Вылеты</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Место</th>
+                <th>Время</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var departure in Model.Departures)
+            {
+                <tr>
+                    <td>@departure.Location</td>
+                    <td>@departure.Time.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>
+                        <a asp-controller="Departure" asp-action="Edit" asp-route-id="@departure.Id" class="btn btn-sm btn-warning">Изменить</a>
+                        <a asp-controller="Departure" asp-action="Delete" asp-route-id="@departure.Id" class="btn btn-sm btn-danger">Удалить</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    
+    <p>
+        <a asp-controller="Departure" asp-action="Create" asp-route-flightId="@Model.Id" class="btn btn-primary">Добавить вылет</a>
+    </p>
+}
+else
+{
+    <div class="alert alert-info">
+        <p>У этого рейса нет вылетов.</p>
+        <a asp-controller="Departure" asp-action="Create" asp-route-flightId="@Model.Id" class="btn btn-primary">Добавить вылет</a>
     </div>
 } 

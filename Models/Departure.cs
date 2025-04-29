@@ -11,7 +11,7 @@ namespace Airport.Models
         public string Location { get; set; } = null!;
 
         [Required(ErrorMessage = "Укажите время вылета")]
-        public TimeSpan Time { get; set; }
+        public DateTime Time { get; set; }
 
         [Required(ErrorMessage = "Выберите рейс")]
         public int FlightId { get; set; }
