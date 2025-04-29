@@ -54,8 +54,18 @@ namespace Airport.Controllers
         }
 
         // GET: Departure/Create
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? flightId)
         {
+            if (flightId.HasValue)
+            {
+                var flight = await _context.Flights.FindAsync(flightId);
+                if (flight != null)
+                {
+                    ViewBag.FlightId = new SelectList(new[] { flight }, "Id", "FlightNumber");
+                    return View(new Departure { FlightId = flight.Id });
+                }
+            }
+            
             ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber");
             return View();
         }
@@ -76,22 +86,30 @@ namespace Airport.Controllers
                             NotificationService.NotificationType.Error);
                     }
                 }
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", departure.FlightId);
+                ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
                 return View(departure);
             }
 
             try
             {
+                // Проверяем, что время вылета после времени вылета рейса
+                var flight = await _context.Flights.FindAsync(departure.FlightId);
+                if (flight != null && departure.Time <= flight.DepartureTime)
+                {
+                    AddNotification("Ошибка", "Время вылета должно быть позже времени вылета рейса", NotificationService.NotificationType.Error);
+                    ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
+                    return View(departure);
+                }
+
                 _context.Add(departure);
-                var result = await _context.SaveChangesAsync();
-                AddNotification("Отладка", $"Строк изменено: {result}", NotificationService.NotificationType.Info);
+                await _context.SaveChangesAsync();
                 AddNotification("Успешно", "Вылет успешно создан", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index), new { flightId = departure.FlightId });
             }
             catch (Exception ex)
             {
                 AddNotification("Ошибка", $"Не удалось сохранить: {ex.Message}", NotificationService.NotificationType.Error);
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", departure.FlightId);
+                ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
                 return View(departure);
             }
         }
@@ -104,7 +122,9 @@ namespace Airport.Controllers
                 return NotFound();
             }
 
-            var departure = await _context.Departures.FindAsync(id);
+            var departure = await _context.Departures
+                .Include(d => d.Flight)
+                .FirstOrDefaultAsync(d => d.Id == id);
             if (departure == null)
             {
                 return NotFound();
@@ -134,15 +154,23 @@ namespace Airport.Controllers
                             NotificationService.NotificationType.Error);
                     }
                 }
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", departure.FlightId);
+                ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
                 return View(departure);
             }
 
             try
             {
+                // Проверяем, что время вылета после времени вылета рейса
+                var flight = await _context.Flights.FindAsync(departure.FlightId);
+                if (flight != null && departure.Time <= flight.DepartureTime)
+                {
+                    AddNotification("Ошибка", "Время вылета должно быть позже времени вылета рейса", NotificationService.NotificationType.Error);
+                    ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
+                    return View(departure);
+                }
+
                 _context.Update(departure);
-                var result = await _context.SaveChangesAsync();
-                AddNotification("Отладка", $"Строк изменено: {result}", NotificationService.NotificationType.Info);
+                await _context.SaveChangesAsync();
                 AddNotification("Успешно", "Вылет успешно обновлен", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index), new { flightId = departure.FlightId });
             }
@@ -160,7 +188,7 @@ namespace Airport.Controllers
             catch (Exception ex)
             {
                 AddNotification("Ошибка", $"Не удалось сохранить: {ex.Message}", NotificationService.NotificationType.Error);
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", departure.FlightId);
+                ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
                 return View(departure);
             }
         }

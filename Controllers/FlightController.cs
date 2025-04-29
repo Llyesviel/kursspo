@@ -76,16 +76,22 @@ namespace Airport.Controllers
 
             try
             {
-                // Устанавливаем количество свободных мест равным количеству мест в самолете
+                // Если не указано количество доступных мест, устанавливаем равным количеству мест в самолете
                 var aircraft = await _context.Aircrafts.FindAsync(flight.AircraftId);
-                if (aircraft != null)
+                if (aircraft != null && flight.AvailableSeats <= 0)
                 {
                     flight.AvailableSeats = aircraft.SeatCount;
                 }
+                // Проверяем, что количество доступных мест не превышает общее количество мест в самолете
+                if (aircraft != null && flight.AvailableSeats > aircraft.SeatCount)
+                {
+                    AddNotification("Ошибка", "Количество доступных мест не может превышать общее количество мест в самолете", NotificationService.NotificationType.Error);
+                    ViewBag.AircraftId = new SelectList(await _context.Aircrafts.ToListAsync(), "Id", "Name", flight.AircraftId);
+                    return View(flight);
+                }
 
                 _context.Add(flight);
-                var result = await _context.SaveChangesAsync();
-                AddNotification("Отладка", $"Строк изменено: {result}", NotificationService.NotificationType.Info);
+                await _context.SaveChangesAsync();
                 AddNotification("Успешно", "Рейс успешно создан", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index));
             }
@@ -143,24 +149,17 @@ namespace Airport.Controllers
 
             try
             {
-                var existingFlight = await _context.Flights
-                    .Include(f => f.Aircraft)
-                    .FirstOrDefaultAsync(f => f.Id == id);
-
-                if (existingFlight == null)
+                // Проверяем, что количество доступных мест не превышает общее количество мест в самолете
+                var aircraft = await _context.Aircrafts.FindAsync(flight.AircraftId);
+                if (aircraft != null && flight.AvailableSeats > aircraft.SeatCount)
                 {
-                    return NotFound();
+                    AddNotification("Ошибка", "Количество доступных мест не может превышать общее количество мест в самолете", NotificationService.NotificationType.Error);
+                    ViewBag.AircraftId = new SelectList(await _context.Aircrafts.ToListAsync(), "Id", "Name", flight.AircraftId);
+                    return View(flight);
                 }
 
-                existingFlight.FlightNumber = flight.FlightNumber;
-                existingFlight.AircraftId = flight.AircraftId;
-                existingFlight.DepartureTime = flight.DepartureTime;
-                existingFlight.AvailableSeats = flight.AvailableSeats;
-                existingFlight.Price = flight.Price;
-
-                _context.Update(existingFlight);
-                var result = await _context.SaveChangesAsync();
-                AddNotification("Отладка", $"Строк изменено: {result}", NotificationService.NotificationType.Info);
+                _context.Update(flight);
+                await _context.SaveChangesAsync();
                 AddNotification("Успешно", "Рейс успешно обновлен", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index));
             }

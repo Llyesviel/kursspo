@@ -36,12 +36,14 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         
-        // Удаляем и пересоздаем базу данных для применения изменений модели
-        context.Database.EnsureDeleted();
+        // Только создаем базу данных, если её нет, но не удаляем существующую
         context.Database.EnsureCreated();
         
-        // Инициализируем базу данных тестовыми данными
-        DbInitializer.Initialize(context);
+        // Инициализируем базу данных тестовыми данными только если таблица пользователей пуста
+        if (!context.Users.Any())
+        {
+            DbInitializer.Initialize(context);
+        }
     }
     catch (Exception ex)
     {

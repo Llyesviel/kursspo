@@ -34,7 +34,7 @@ else
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.OrderBy(l => l.Time)) {
         <tr>
             @if (ViewBag.FlightId == null)
             {

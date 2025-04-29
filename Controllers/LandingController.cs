@@ -54,8 +54,18 @@ namespace Airport.Controllers
         }
 
         // GET: Landing/Create
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? flightId)
         {
+            if (flightId.HasValue)
+            {
+                var flight = await _context.Flights.FindAsync(flightId);
+                if (flight != null)
+                {
+                    ViewBag.FlightId = new SelectList(new[] { flight }, "Id", "FlightNumber");
+                    return View(new Landing { FlightId = flight.Id });
+                }
+            }
+            
             ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber");
             return View();
         }
@@ -76,22 +86,49 @@ namespace Airport.Controllers
                             NotificationService.NotificationType.Error);
                     }
                 }
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", landing.FlightId);
+                
+                // Нужно создать новый SelectList с текущими данными
+                if (landing.FlightId > 0)
+                {
+                    var flight = await _context.Flights.FindAsync(landing.FlightId);
+                    if (flight != null)
+                    {
+                        ViewBag.FlightId = new SelectList(new[] { flight }, "Id", "FlightNumber", landing.FlightId);
+                        return View(landing);
+                    }
+                }
+                
+                ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", landing.FlightId);
                 return View(landing);
             }
 
             try
             {
+                // Проверяем, что время посадки после времени вылета рейса
+                var flight = await _context.Flights.FindAsync(landing.FlightId);
+                if (flight == null)
+                {
+                    AddNotification("Ошибка", "Рейс не найден", NotificationService.NotificationType.Error);
+                    ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", landing.FlightId);
+                    return View(landing);
+                }
+                
+                if (landing.Time <= flight.DepartureTime)
+                {
+                    AddNotification("Ошибка", "Время посадки должно быть позже времени вылета рейса", NotificationService.NotificationType.Error);
+                    ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", landing.FlightId);
+                    return View(landing);
+                }
+
                 _context.Add(landing);
-                var result = await _context.SaveChangesAsync();
-                AddNotification("Отладка", $"Строк изменено: {result}", NotificationService.NotificationType.Info);
+                await _context.SaveChangesAsync();
                 AddNotification("Успешно", "Посадка успешно создана", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index), new { flightId = landing.FlightId });
             }
             catch (Exception ex)
             {
                 AddNotification("Ошибка", $"Не удалось сохранить: {ex.Message}", NotificationService.NotificationType.Error);
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", landing.FlightId);
+                ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", landing.FlightId);
                 return View(landing);
             }
         }
@@ -104,7 +141,9 @@ namespace Airport.Controllers
                 return NotFound();
             }
 
-            var landing = await _context.Landings.FindAsync(id);
+            var landing = await _context.Landings
+                .Include(l => l.Flight)
+                .FirstOrDefaultAsync(l => l.Id == id);
             if (landing == null)
             {
                 return NotFound();
@@ -134,15 +173,42 @@ namespace Airport.Controllers
                             NotificationService.NotificationType.Error);
                     }
                 }
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", landing.FlightId);
+                
+                // Нужно создать новый SelectList с текущими данными
+                if (landing.FlightId > 0)
+                {
+                    var flight = await _context.Flights.FindAsync(landing.FlightId);
+                    if (flight != null)
+                    {
+                        ViewBag.FlightId = new SelectList(new[] { flight }, "Id", "FlightNumber", landing.FlightId);
+                        return View(landing);
+                    }
+                }
+                
+                ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", landing.FlightId);
                 return View(landing);
             }
 
             try
             {
+                // Проверяем, что время посадки после времени вылета рейса
+                var flight = await _context.Flights.FindAsync(landing.FlightId);
+                if (flight == null)
+                {
+                    AddNotification("Ошибка", "Рейс не найден", NotificationService.NotificationType.Error);
+                    ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", landing.FlightId);
+                    return View(landing);
+                }
+                
+                if (landing.Time <= flight.DepartureTime)
+                {
+                    AddNotification("Ошибка", "Время посадки должно быть позже времени вылета рейса", NotificationService.NotificationType.Error);
+                    ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", landing.FlightId);
+                    return View(landing);
+                }
+
                 _context.Update(landing);
-                var result = await _context.SaveChangesAsync();
-                AddNotification("Отладка", $"Строк изменено: {result}", NotificationService.NotificationType.Info);
+                await _context.SaveChangesAsync();
                 AddNotification("Успешно", "Посадка успешно обновлена", NotificationService.NotificationType.Success);
                 return RedirectToAction(nameof(Index), new { flightId = landing.FlightId });
             }
@@ -160,7 +226,7 @@ namespace Airport.Controllers
             catch (Exception ex)
             {
                 AddNotification("Ошибка", $"Не удалось сохранить: {ex.Message}", NotificationService.NotificationType.Error);
-                ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", landing.FlightId);
+                ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", landing.FlightId);
                 return View(landing);
             }
         }

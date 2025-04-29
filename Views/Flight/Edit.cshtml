@@ -17,20 +17,20 @@
                 <input asp-for="FlightNumber" class="form-control" />
                 <span asp-validation-for="FlightNumber" class="text-danger"></span>
             </div>
-            <div class="form-group mb-3">
+            <div class="form-group">
                 <label asp-for="AircraftId" class="control-label">Самолет</label>
                 <select asp-for="AircraftId" class="form-control" asp-items="ViewBag.AircraftId"></select>
                 <span asp-validation-for="AircraftId" class="text-danger"></span>
             </div>
-            <div class="form-group mb-3">
-                <label asp-for="DepartureTime" class="control-label">Время вылета</label>
-                <input asp-for="DepartureTime" class="form-control" type="datetime-local" />
-                <span asp-validation-for="DepartureTime" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="AvailableSeats" class="control-label">Свободные места</label>
+            <div class="form-group">
+                <label asp-for="AvailableSeats" class="control-label">Доступные места</label>
                 <input asp-for="AvailableSeats" class="form-control" />
                 <span asp-validation-for="AvailableSeats" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="DepartureTime" class="control-label">Время вылета</label>
+                <input asp-for="DepartureTime" class="form-control" type="datetime-local" step="60" />
+                <span asp-validation-for="DepartureTime" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Price" class="control-label">Цена</label>

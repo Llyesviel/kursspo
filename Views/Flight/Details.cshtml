@@ -38,6 +38,19 @@
         </dt>
         <dd class="col-sm-9">
             @Html.DisplayFor(model => model.AvailableSeats) из @Html.DisplayFor(model => model.Aircraft.SeatCount)
+            @{
+                var loadPercentage = (int)((double)(Model.Aircraft.SeatCount - Model.AvailableSeats) / Model.Aircraft.SeatCount * 100);
+            }
+            <div class="progress mt-2">
+                <div class="progress-bar @(loadPercentage > 80 ? "bg-danger" : loadPercentage > 50 ? "bg-warning" : "bg-success")" 
+                     role="progressbar" 
+                     style="width: @loadPercentage%" 
+                     aria-valuenow="@loadPercentage" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                    @loadPercentage%
+                </div>
+            </div>
         </dd>
         <dt class="col-sm-3">
             Цена
