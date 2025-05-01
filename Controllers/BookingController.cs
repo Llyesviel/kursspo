@@ -133,6 +133,22 @@ namespace Airport.Controllers
             return View(tickets);
         }
         
+        // GET: История перелетов
+        [HttpGet]
+        public async Task<IActionResult> FlightHistory()
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ?? "0");
+            var tickets = await _context.Tickets
+                .Include(t => t.Flight)
+                .Include(t => t.Flight.Aircraft)
+                .Where(t => t.UserId == userId)
+                .OrderByDescending(t => t.Date)
+                .ThenByDescending(t => t.Time)
+                .ToListAsync();
+
+            return View(tickets);
+        }
+        
         // Вспомогательный метод для генерации случайного места
         private string GenerateRandomSeat()
         {

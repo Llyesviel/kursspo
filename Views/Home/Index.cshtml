@@ -20,20 +20,45 @@
         <div class="search-container">
             <form asp-controller="Home" asp-action="SearchFlights" method="get" class="row g-3">
                 <div class="col-md-4">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="departure" name="departure" placeholder="Откуда">
+                    <div class="form-floating position-relative">
+                        <input type="text" class="form-control" id="departure" name="departure" placeholder="Откуда" list="departureOptions">
                         <label for="departure">Откуда</label>
+                        <datalist id="departureOptions">
+                            <option value="Москва"></option>
+                            <option value="Санкт-Петербург"></option>
+                            <option value="Казань"></option>
+                            <option value="Новосибирск"></option>
+                            <option value="Екатеринбург"></option>
+                            <option value="Сочи"></option>
+                            <option value="Краснодар"></option>
+                            <option value="Калининград"></option>
+                        </datalist>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="destination" name="destination" placeholder="Куда">
+                <div class="col-md-1 d-flex align-items-center justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary exchange-btn" onclick="exchangeAirports()">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating position-relative">
+                        <input type="text" class="form-control" id="destination" name="destination" placeholder="Куда" list="destinationOptions">
                         <label for="destination">Куда</label>
+                        <datalist id="destinationOptions">
+                            <option value="Москва"></option>
+                            <option value="Санкт-Петербург"></option>
+                            <option value="Казань"></option>
+                            <option value="Новосибирск"></option>
+                            <option value="Екатеринбург"></option>
+                            <option value="Сочи"></option>
+                            <option value="Краснодар"></option>
+                            <option value="Калининград"></option>
+                        </datalist>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating">
-                        <input type="date" class="form-control" id="date" name="date" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                        <input type="date" class="form-control" id="date" name="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="2030-12-31">
                         <label for="date">Дата вылета</label>
                     </div>
                 </div>
@@ -44,6 +69,26 @@
                 </div>
             </form>
         </div>
+        
+        @if (User?.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
+        {
+            <div class="text-center mt-3 user-quick-actions">
+                <a asp-controller="Booking" asp-action="MyTickets" class="btn btn-outline-primary mx-2">
+                    <i class="fas fa-ticket-alt me-2"></i>Мои билеты
+                </a>
+                <a asp-controller="Booking" asp-action="FlightHistory" class="btn btn-outline-primary mx-2">
+                    <i class="fas fa-history me-2"></i>История перелетов
+                </a>
+            </div>
+        }
+        else if (User?.Identity == null || !User.Identity.IsAuthenticated)
+        {
+            <div class="text-center mt-3">
+                <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>Войдите, чтобы увидеть свои билеты
+                </a>
+            </div>
+        }
     </div>
 </section>
 
@@ -134,7 +179,7 @@
                             </div>
                             <h3 class="card-title">Мой профиль</h3>
                             <p class="card-text">Управление личными данными и настройками</p>
-                            <a asp-controller="Account" asp-action="Profile" class="btn btn-primary mt-3">Профиль</a>
+                            <a asp-controller="Auth" asp-action="Profile" class="btn btn-primary mt-3">Профиль</a>
                         </div>
                     </div>
                 </div>
@@ -327,16 +372,6 @@
     </div>
 </section>
 
-@if (User?.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
-{
-    <!-- Кнопка быстрого доступа "Мои билеты" -->
-    <div class="quick-access-panel">
-        <a asp-controller="Home" asp-action="MyTickets" class="quick-access-btn" title="Мои билеты">
-            <i class="fas fa-ticket-alt"></i>
-        </a>
-    </div>
-}
-
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.cells.min.js"></script>
@@ -355,6 +390,16 @@
                 size: 1.70,
                 speed: 1.50
             });
+            
+            // Функция для обмена городами
+            window.exchangeAirports = function() {
+                const departure = document.getElementById('departure');
+                const destination = document.getElementById('destination');
+                const temp = departure.value;
+                
+                departure.value = destination.value;
+                destination.value = temp;
+            };
         });
     </script>
 } 

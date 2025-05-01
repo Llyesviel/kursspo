@@ -15,8 +15,9 @@
     <header class="modern-header">
         <div class="container">
             <nav class="navbar navbar-expand-lg navbar-light">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    <span style="color: var(--primary-color);">Air</span>logistics
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-plane-departure me-2" style="color: var(--primary-color);"></i>
+                    <span class="logo-first">Air</span><span class="logo-second">logistics</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
@@ -24,8 +25,8 @@
                 <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home"></i> Главная
+                            <a class="nav-link d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home me-2"></i> Главная
                             </a>
                         </li>
                         @if (User?.Identity != null && User.Identity.IsAuthenticated)
@@ -33,21 +34,26 @@
                             @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Admin" asp-action="Index">
-                                        <i class="fas fa-tachometer-alt"></i> Админпанель
+                                    <a class="nav-link d-flex align-items-center" asp-controller="Admin" asp-action="Index">
+                                        <i class="fas fa-tachometer-alt me-2"></i> Админпанель
                                     </a>
                                 </li>
                             }
                             else
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Home" asp-action="SearchFlights">
-                                        <i class="fas fa-search"></i> Поиск рейсов
+                                    <a class="nav-link d-flex align-items-center" asp-controller="Home" asp-action="SearchFlights">
+                                        <i class="fas fa-search me-2"></i> Поиск рейсов
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Booking" asp-action="MyTickets">
-                                        <i class="fas fa-ticket-alt"></i> Мои билеты
+                                    <a class="nav-link d-flex align-items-center" asp-controller="Booking" asp-action="MyTickets">
+                                        <i class="fas fa-ticket-alt me-2"></i> Мои билеты
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center" asp-controller="Home" asp-action="FlightStatus">
+                                        <i class="fas fa-info-circle me-2"></i> Статус рейса
                                     </a>
                                 </li>
                             }
@@ -55,8 +61,13 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Home" asp-action="SearchFlights">
-                                    <i class="fas fa-search"></i> Поиск рейсов
+                                <a class="nav-link d-flex align-items-center" asp-controller="Home" asp-action="SearchFlights">
+                                    <i class="fas fa-search me-2"></i> Поиск рейсов
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center" asp-controller="Home" asp-action="FlightStatus">
+                                    <i class="fas fa-info-circle me-2"></i> Статус рейса
                                 </a>
                             </li>
                         }
@@ -65,14 +76,14 @@
                         @if (User?.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Auth" asp-action="Profile">
-                                    <i class="fas fa-user-circle"></i> Профиль
+                                <a class="nav-link d-flex align-items-center" asp-controller="Auth" asp-action="Profile">
+                                    <i class="fas fa-user-circle me-2"></i> Профиль
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <form asp-controller="Auth" asp-action="Logout" method="post">
-                                    <button type="submit" class="btn btn-link nav-link">
-                                        <i class="fas fa-sign-out-alt"></i> Выйти
+                                    <button type="submit" class="btn btn-link nav-link d-flex align-items-center">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Выйти
                                     </button>
                                 </form>
                             </li>
@@ -80,13 +91,13 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Auth" asp-action="Login">
-                                    <i class="fas fa-sign-in-alt"></i> Войти
+                                <a class="nav-link d-flex align-items-center" asp-controller="Auth" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt me-2"></i> Войти
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Auth" asp-action="Register">
-                                    <i class="fas fa-user-plus"></i> Регистрация
+                                <a class="nav-link d-flex align-items-center" asp-controller="Auth" asp-action="Register">
+                                    <i class="fas fa-user-plus me-2"></i> Регистрация
                                 </a>
                             </li>
                         }

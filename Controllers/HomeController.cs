@@ -24,6 +24,7 @@ namespace Airport.Controllers
             return RedirectToAction("MainPage");
         }
 
+        [AllowAnonymous]
         public IActionResult MainPage()
         {
             return View("Index");
@@ -34,7 +35,27 @@ namespace Airport.Controllers
             return View();
         }
 
+        [AllowAnonymous]
+        public async Task<IActionResult> FlightStatus(string flightNumber = "")
+        {
+            if (string.IsNullOrEmpty(flightNumber))
+            {
+                return View(new List<Flight>());
+            }
+
+            var flights = await _context.Flights
+                .Include(f => f.Aircraft)
+                .Include(f => f.Landings)
+                .Where(f => f.FlightNumber.Contains(flightNumber))
+                .OrderBy(f => f.DepartureTime)
+                .ToListAsync();
+
+            ViewBag.FlightNumber = flightNumber;
+            return View(flights);
+        }
+
         // Поиск ближайшего рейса до заданного пункта с наличием свободных мест
+        [AllowAnonymous]
         public async Task<IActionResult> SearchFlights(string departure, string destination, DateTime? departureDate)
         {
             // Если дата не указана, используем текущую дату

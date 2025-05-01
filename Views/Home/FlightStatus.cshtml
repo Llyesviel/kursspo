@@ -1,0 +1,162 @@
+@model List<Airport.Models.Flight>
+@{
+    ViewData["Title"] = "Статус рейса";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Проверка статуса рейса</h2>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form asp-controller="Home" asp-action="FlightStatus" method="get" class="row g-3 align-items-center">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="flightNumber" name="flightNumber" placeholder="Номер рейса" value="@(ViewBag.FlightNumber ?? "")">
+                                <label for="flightNumber">Номер рейса</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary h-100">
+                                <i class="fas fa-search me-2"></i>Проверить статус
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Count > 0)
+    {
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Результаты поиска</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Номер рейса</th>
+                                        <th>Самолет</th>
+                                        <th>Дата и время отправления</th>
+                                        <th>Направления</th>
+                                        <th>Статус</th>
+                                        <th>Свободные места</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var flight in Model)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@flight.FlightNumber</td>
+                                            <td>@(flight.Aircraft?.Name ?? "Не указано")</td>
+                                            <td>@flight.DepartureTime.ToString("dd.MM.yyyy HH:mm")</td>
+                                            <td>
+                                                @if (flight.Landings != null && flight.Landings.Any())
+                                                {
+                                                    string destinations = string.Join(" → ", flight.Landings.OrderBy(l => l.Time).Select(l => l.Location));
+                                                    <span>@destinations</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>Нет данных о маршруте</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @{
+                                                    string status = "Запланирован";
+                                                    string statusClass = "bg-info";
+
+                                                    if (flight.DepartureTime < DateTime.Now)
+                                                    {
+                                                        status = "Вылетел";
+                                                        statusClass = "bg-success";
+                                                    }
+                                                    else if (flight.DepartureTime < DateTime.Now.AddHours(1))
+                                                    {
+                                                        status = "Посадка";
+                                                        statusClass = "bg-warning";
+                                                    }
+                                                }
+                                                <span class="badge @statusClass">@status</span>
+                                            </td>
+                                            <td>
+                                                @if (flight.AvailableSeats > 0)
+                                                {
+                                                    <span class="text-success">@flight.AvailableSeats</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-danger">Нет мест</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(ViewBag.FlightNumber))
+    {
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Рейсы по запросу "<strong>@ViewBag.FlightNumber</strong>" не найдены. Проверьте номер рейса и попробуйте снова.
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Введите номер рейса для проверки его статуса.
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">Обозначения статусов</h5>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-info me-2">Запланирован</span>
+                            <span class="small">Рейс запланирован и будет выполнен по расписанию</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-warning me-2">Посадка</span>
+                            <span class="small">Объявлена посадка на рейс (менее 1 часа до вылета)</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-success me-2">Вылетел</span>
+                            <span class="small">Рейс успешно отправлен</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Фокус на поле ввода при загрузке страницы
+            $("#flightNumber").focus();
+        });
+    </script>
+} 
