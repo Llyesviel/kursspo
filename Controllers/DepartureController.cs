@@ -25,13 +25,15 @@ namespace Airport.Controllers
                 var flight = await _context.Flights
                     .Include(f => f.Aircraft)
                     .FirstOrDefaultAsync(f => f.Id == flightId);
-                
+
                 if (flight == null)
                 {
                     return NotFound();
                 }
                 
-                ViewBag.FlightInfo = $"Рейс {flight.FlightNumber} ({flight.Aircraft.Name})";
+                string flightNumber = flight.FlightNumber ?? "Без номера";
+                string aircraftName = flight.Aircraft?.Name ?? "Неизвестно";
+                ViewBag.FlightInfo = $"Рейс {flightNumber} ({aircraftName})";
                 ViewBag.FlightId = flightId;
                 
                 var departures = await _context.Departures
@@ -45,7 +47,8 @@ namespace Airport.Controllers
             {
                 var departures = await _context.Departures
                     .Include(d => d.Flight)
-                    .OrderBy(d => d.Flight.FlightNumber)
+                    .ThenInclude(f => f != null ? f.Aircraft : null)
+                    .OrderBy(d => d.Flight != null ? d.Flight.FlightNumber : string.Empty)
                     .ThenBy(d => d.Time)
                     .ToListAsync();
                 

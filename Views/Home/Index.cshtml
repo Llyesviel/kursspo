@@ -47,7 +47,7 @@
     </div>
 </section>
 
-@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+@if (User?.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
 {
     <div class="container mt-4">
         <div class="alert alert-primary">
@@ -62,7 +62,7 @@
         <div class="row">
         @{
             // Для неаутентифицированных пользователей
-            if (!User.Identity.IsAuthenticated)
+            if (User?.Identity == null || !User.Identity.IsAuthenticated)
             {
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 feature-card">
@@ -100,7 +100,7 @@
             }
             
             // Для обычных пользователей (не администраторов)
-            if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
+            if (User?.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
             {
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 feature-card">
@@ -224,51 +224,87 @@
             <p class="section-subtitle">Полный спектр услуг для удобного управления полетами</p>
         </div>
         <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="col-md-5 mb-4 mb-lg-0">
                 <div class="capabilities-image">
-                    <video class="img-fluid rounded shadow" controls autoplay muted loop>
+                    <video class="capabilities-video" controls autoplay muted loop>
                         <source src="/videos/pinterestdownloader.com-1746124218.169551 (online-video-cutter.com).mp4" type="video/mp4">
                         Ваш браузер не поддерживает видео.
                     </video>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-md-7">
                 <div class="capabilities-list">
-                    <div class="capability-item mb-4">
+                    <div class="capability-item">
                         <div class="d-flex align-items-center mb-2">
                             <div class="capability-icon me-3">
-                                <i class="fas fa-check-circle text-success"></i>
+                                <i class="fas fa-search text-success"></i>
                             </div>
                             <h4 class="mb-0">Умный поиск рейсов</h4>
                         </div>
-                        <p>Фильтрация по множеству параметров: цена, время, дата, количество пересадок и наличие мест.</p>
-                    </div>
-                    <div class="capability-item mb-4">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="capability-icon me-3">
-                                <i class="fas fa-check-circle text-success"></i>
-                            </div>
-                            <h4 class="mb-0">Онлайн-регистрация</h4>
-                        </div>
-                        <p>Регистрируйтесь на рейс онлайн и получайте посадочный талон прямо на свой электронный адрес.</p>
-                    </div>
-                    <div class="capability-item mb-4">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="capability-icon me-3">
-                                <i class="fas fa-check-circle text-success"></i>
-                            </div>
-                            <h4 class="mb-0">Трекинг статуса рейса</h4>
-                        </div>
-                        <p>Отслеживайте текущий статус рейса в реальном времени и получайте актуальную информацию о вылете.</p>
+                        <p>Фильтрация по городам отправления и прибытия, датам и наличию мест. Выбор из множества доступных рейсов.</p>
                     </div>
                     <div class="capability-item">
                         <div class="d-flex align-items-center mb-2">
                             <div class="capability-icon me-3">
-                                <i class="fas fa-check-circle text-success"></i>
+                                <i class="fas fa-sort-amount-down text-success"></i>
                             </div>
-                            <h4 class="mb-0">Управление бронированием</h4>
+                            <h4 class="mb-0">Сортировка и рекомендации</h4>
                         </div>
-                        <p>Изменяйте, отменяйте или дополняйте бронирование прямо в личном кабинете без дополнительных обращений.</p>
+                        <p>Умная сортировка рейсов по цене, времени и количеству свободных мест. Рекомендации наиболее выгодных предложений.</p>
+                    </div>
+                    <div class="capability-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="capability-icon me-3">
+                                <i class="fas fa-ticket-alt text-success"></i>
+                            </div>
+                            <h4 class="mb-0">Управление билетами</h4>
+                        </div>
+                        <p>Просмотр забронированных и купленных билетов. Удобный доступ к истории заказов через панель "Мои билеты".</p>
+                    </div>
+                    <div class="capability-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="capability-icon me-3">
+                                <i class="fas fa-shopping-cart text-success"></i>
+                            </div>
+                            <h4 class="mb-0">Онлайн бронирование</h4>
+                        </div>
+                        <p>Мгновенное бронирование билетов через интернет без необходимости посещения кассы. Электронные билеты доступны сразу после оплаты.</p>
+                    </div>
+                    <div class="capability-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="capability-icon me-3">
+                                <i class="fas fa-chart-bar text-success"></i>
+                            </div>
+                            <h4 class="mb-0">Статистика и отчетность</h4>
+                        </div>
+                        <p>Формирование отчетов о проданных билетах и загруженности рейсов. Анализ продаж по различным параметрам.</p>
+                    </div>
+                    <div class="capability-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="capability-icon me-3">
+                                <i class="fas fa-plane text-success"></i>
+                            </div>
+                            <h4 class="mb-0">Информация о самолетах</h4>
+                        </div>
+                        <p>Подробные данные о воздушных судах: модель, категория и вместимость. Учет занятых и свободных мест.</p>
+                    </div>
+                    <div class="capability-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="capability-icon me-3">
+                                <i class="fas fa-map-marker-alt text-success"></i>
+                            </div>
+                            <h4 class="mb-0">Управление расписанием</h4>
+                        </div>
+                        <p>Полная информация о вылетах и прилетах. Отслеживание рейсов по городам, датам и времени.</p>
+                    </div>
+                    <div class="capability-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="capability-icon me-3">
+                                <i class="fas fa-lock text-success"></i>
+                            </div>
+                            <h4 class="mb-0">Безопасная авторизация</h4>
+                        </div>
+                        <p>Защищенная система регистрации и входа пользователей. Хеширование паролей и защита персональных данных.</p>
                     </div>
                 </div>
             </div>
@@ -291,7 +327,7 @@
     </div>
 </section>
 
-@if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
+@if (User?.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
 {
     <!-- Кнопка быстрого доступа "Мои билеты" -->
     <div class="quick-access-panel">

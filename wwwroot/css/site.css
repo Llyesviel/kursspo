@@ -379,14 +379,53 @@ footer a:hover {
     width: 100%;
 }
 
+.capabilities-video {
+    height: auto;
+    width: 80%;
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+.capabilities-list {
+    height: auto;
+    overflow-y: visible;
+    padding-right: 15px;
+}
+
 .capability-icon {
     font-size: 1.2rem;
     color: var(--primary-color);
+    min-width: 24px;
+}
+
+.capability-item {
+    position: relative;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.capability-item:last-child {
+    margin-bottom: 0;
+}
+
+.capability-item .d-flex {
+    margin-bottom: 5px;
 }
 
 .capability-item h4 {
     color: var(--primary-color);
     font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.capability-item p {
+    margin-bottom: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
 }
 
 /* Стили для секции с призывом к действию */

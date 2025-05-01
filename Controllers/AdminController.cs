@@ -141,40 +141,32 @@ namespace Airport.Controllers
         }
 
         // GET: Admin/Departures
-        public async Task<IActionResult> Departures(int? flightId)
+        public IActionResult Departures(int? id)
         {
-            if (flightId.HasValue)
+            if (id == null)
             {
-                var flight = await _context.Flights
-                    .Include(f => f.Aircraft)
-                    .FirstOrDefaultAsync(f => f.Id == flightId);
-                
-                if (flight == null)
-                {
-                    return NotFound();
-                }
-                
-                ViewBag.FlightInfo = $"Рейс {flight.FlightNumber} ({flight.Aircraft.Name})";
-                ViewBag.FlightId = flightId;
-                
-                var departures = await _context.Departures
-                    .Where(d => d.FlightId == flightId)
-                    .OrderBy(d => d.Time)
-                    .ToListAsync();
-                
-                return View(departures);
+                return NotFound();
             }
-            else
+
+            var flight = _context.Flights
+                .Include(f => f.Aircraft)
+                .Include(f => f.Departures)
+                .FirstOrDefault(f => f.Id == id);
+
+            if (flight == null)
             {
-                var departures = await _context.Departures
-                    .Include(d => d.Flight)
-                    .ThenInclude(f => f.Aircraft)
-                    .OrderBy(d => d.Flight.FlightNumber)
-                    .ThenBy(d => d.Time)
-                    .ToListAsync();
-                
-                return View(departures);
+                return NotFound();
             }
+
+            ViewBag.FlightId = flight.Id;
+            ViewBag.FlightInfo = $"Рейс {flight.FlightNumber} ({(flight.Aircraft != null ? flight.Aircraft.Name : "Неизвестно")})";
+
+            var departures = _context.Departures
+                .Where(d => d.FlightId == id)
+                .Include(d => d.Flight)
+                .ToList();
+
+            return View(departures);
         }
 
         // GET: Admin/CreateDeparture

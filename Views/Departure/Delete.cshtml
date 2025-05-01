@@ -14,7 +14,7 @@
             Рейс
         </dt>
         <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Flight.FlightNumber)
+            @(Model.Flight != null ? Model.Flight.FlightNumber : "-")
         </dd>
         <dt class="col-sm-3">
             Место вылета
@@ -26,13 +26,13 @@
             Время вылета
         </dt>
         <dd class="col-sm-9">
-            @Model.Time.ToString("HH:mm")
+            @(Model != null ? Model.Time.ToString("HH:mm") : "-")
         </dd>
     </dl>
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Удалить" class="btn btn-danger" />
-        <a asp-action="Index" asp-route-flightId="@Model.FlightId" class="btn btn-secondary">Назад к списку</a>
+        <a asp-action="Index" asp-route-flightId="@(Model != null ? Model.FlightId : 0)" class="btn btn-secondary">Назад к списку</a>
     </form>
 </div> 

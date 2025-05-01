@@ -39,7 +39,7 @@ else
             @if (ViewBag.FlightId == null)
             {
                 <td>
-                    @Html.DisplayFor(modelItem => item.Flight.FlightNumber)
+                    @(item.Flight != null ? item.Flight.FlightNumber : "-")
                 </td>
             }
             <td>

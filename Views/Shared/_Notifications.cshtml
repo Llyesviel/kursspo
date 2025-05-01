@@ -2,32 +2,36 @@
 @using Airport.Services
 
 @{
-    if (TempData["Notifications"] != null)
+    if (TempData != null && TempData["Notifications"] != null)
     {
-        var notifications = JsonSerializer.Deserialize<List<NotificationService.Notification>>(TempData["Notifications"].ToString());
-        
-        if (notifications != null && notifications.Any())
+        var notificationsJson = TempData["Notifications"]?.ToString();
+        if (!string.IsNullOrEmpty(notificationsJson))
         {
-            <div class="notifications-container">
-                @foreach (var notification in notifications)
-                {
-                    <div class="alert alert-@notification.GetCssClass() alert-dismissible fade show notification-item" role="alert">
-                        <div class="d-flex align-items-center">
-                            <div class="notification-icon me-3">
-                                <i class="@notification.GetIcon()"></i>
+            var notifications = JsonSerializer.Deserialize<List<NotificationService.Notification>>(notificationsJson);
+            
+            if (notifications != null && notifications.Any())
+            {
+                <div class="notifications-container">
+                    @foreach (var notification in notifications)
+                    {
+                        <div class="alert alert-@notification.GetCssClass() alert-dismissible fade show notification-item" role="alert">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon me-3">
+                                    <i class="@notification.GetIcon()"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <h5 class="alert-heading mb-1 fw-bold">@notification.Title</h5>
+                                    <p class="mb-0">@notification.Message</p>
+                                </div>
                             </div>
-                            <div class="notification-content">
-                                <h5 class="alert-heading mb-1 fw-bold">@notification.Title</h5>
-                                <p class="mb-0">@notification.Message</p>
-                            </div>
+                            @if (notification.IsDismissible)
+                            {
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            }
                         </div>
-                        @if (notification.IsDismissible)
-                        {
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        }
-                    </div>
-                }
-            </div>
+                    }
+                </div>
+            }
         }
     }
 }

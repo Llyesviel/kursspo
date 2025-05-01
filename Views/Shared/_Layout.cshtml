@@ -28,7 +28,7 @@
                                 <i class="fas fa-home"></i> Главная
                             </a>
                         </li>
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User?.Identity != null && User.Identity.IsAuthenticated)
                         {
                             @if (User.IsInRole("Admin"))
                             {
@@ -62,7 +62,7 @@
                         }
                     </ul>
                     <ul class="navbar-nav">
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User?.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Auth" asp-action="Profile">
@@ -115,7 +115,7 @@
                     <ul class="list-unstyled">
                         <li><a asp-controller="Home" asp-action="Index">Главная</a></li>
                         <li><a asp-controller="Home" asp-action="SearchFlights">Поиск рейсов</a></li>
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        @if (User?.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                         {
                             <li><a asp-controller="Admin" asp-action="Index">Панель управления</a></li>
                         }

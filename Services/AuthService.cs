@@ -25,6 +25,27 @@ namespace Airport.Services
 
         public async Task<User> RegisterAsync(RegisterViewModel model)
         {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            // Валидация входных данных
+            if (string.IsNullOrEmpty(model.Email))
+            {
+                throw new ArgumentException("Email не может быть пустым", nameof(model.Email));
+            }
+
+            if (string.IsNullOrEmpty(model.Username))
+            {
+                throw new ArgumentException("Имя пользователя не может быть пустым", nameof(model.Username));
+            }
+
+            if (string.IsNullOrEmpty(model.Password))
+            {
+                throw new ArgumentException("Пароль не может быть пустым", nameof(model.Password));
+            }
+
             if (await UserExistsAsync(model.Email))
             {
                 throw new Exception("Пользователь с таким email уже существует");
@@ -45,6 +66,21 @@ namespace Airport.Services
 
         public async Task<User> LoginAsync(LoginViewModel model)
         {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            if (string.IsNullOrEmpty(model.Email))
+            {
+                throw new ArgumentException("Email не может быть пустым", nameof(model.Email));
+            }
+
+            if (string.IsNullOrEmpty(model.Password))
+            {
+                throw new ArgumentException("Пароль не может быть пустым", nameof(model.Password));
+            }
+
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == model.Email);
 
@@ -58,11 +94,21 @@ namespace Airport.Services
 
         public async Task<bool> UserExistsAsync(string email)
         {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException("Email не может быть пустым", nameof(email));
+            }
+
             return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
         private string HashPassword(string password)
         {
+            if (string.IsNullOrEmpty(password))
+            {
+                throw new ArgumentException("Пароль не может быть пустым", nameof(password));
+            }
+
             using (var sha256 = SHA256.Create())
             {
                 var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
@@ -72,6 +118,16 @@ namespace Airport.Services
 
         private bool VerifyPassword(string password, string hash)
         {
+            if (string.IsNullOrEmpty(password))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(hash))
+            {
+                return false;
+            }
+
             return HashPassword(password) == hash;
         }
     }

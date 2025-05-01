@@ -163,13 +163,21 @@ namespace Airport.Controllers
 
     public class BookingViewModel
     {
+        public int Id { get; set; }
         public int FlightId { get; set; }
-        public string FlightNumber { get; set; }
+        public int DepartureId { get; set; }
         public DateTime DepartureTime { get; set; }
+        public DateTime ArrivalTime { get; set; }
+        public string FlightNumber { get; set; } = string.Empty;
+        public string DepartureCity { get; set; } = string.Empty;
+        public string ArrivalCity { get; set; } = string.Empty;
+        public int SeatNumber { get; set; }
+        public string PassengerName { get; set; } = string.Empty;
+        public string DocumentNumber { get; set; } = string.Empty;
+        public string ContactPhone { get; set; } = string.Empty;
+        public string ContactEmail { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public string PassengerName { get; set; }
-        public string DocumentNumber { get; set; }
-        public string ContactPhone { get; set; }
-        public string ContactEmail { get; set; }
+        public DateTime BookingDate { get; set; }
+        public string Status { get; set; } = string.Empty;
     }
 } 
