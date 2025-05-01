@@ -103,38 +103,80 @@
     <!-- Подключаем оповещения -->
     <partial name="_Notifications" />
 
-    <footer class="modern-footer">
+    <footer class="mt-5">
         <div class="container">
             <div class="row">
-                <div class="col-md-5">
-                    <h5>Airlogistics</h5>
-                    <p>Эффективное решение для управления авиарейсами, самолетами и билетами.</p>
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <a href="/" class="footer-logo text-white text-decoration-none">Airlogistics</a>
+                    <p class="description">Эффективное решение для управления авиарейсами, самолетами и билетами.</p>
+                    <div class="social-links">
+                        <a href="https://vk.com/" class="social-link" target="_blank"><i class="fab fa-vk"></i></a>
+                        <a href="https://telegram.org/" class="social-link" target="_blank"><i class="fab fa-telegram-plane"></i></a>
+                        <a href="https://www.whatsapp.com/" class="social-link" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.youtube.com/" class="social-link" target="_blank"><i class="fab fa-youtube"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <h6>Полезные ссылки</h6>
-                    <ul class="list-unstyled">
+                <div class="col-lg-2 col-md-4 mb-4 mb-lg-0">
+                    <h5>Полезные ссылки</h5>
+                    <ul>
                         <li><a asp-controller="Home" asp-action="Index">Главная</a></li>
                         <li><a asp-controller="Home" asp-action="SearchFlights">Поиск рейсов</a></li>
-                        @if (User?.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        <li><a asp-controller="Home" asp-action="Privacy">Политика</a></li>
+                        @if (User?.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            <li><a asp-controller="Admin" asp-action="Index">Панель управления</a></li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li><a asp-controller="Admin" asp-action="Index">Панель управления</a></li>
+                            }
+                            <li><a asp-controller="Home" asp-action="MyTickets">Мои билеты</a></li>
+                            <li><a asp-controller="Auth" asp-action="Logout">Выход</a></li>
+                        }
+                        else
+                        {
+                            <li><a asp-controller="Auth" asp-action="Login">Вход</a></li>
+                            <li><a asp-controller="Auth" asp-action="Register">Регистрация</a></li>
                         }
                     </ul>
                 </div>
-                <div class="col-md-4">
-                    <h6>Контакты</h6>
-                    <ul class="list-unstyled">
-                        <li><i class="fas fa-envelope me-2"></i> support@airlogistics.ru</li>
-                        <li><i class="fas fa-phone me-2"></i> +7 (999) 123-45-67</li>
-                        <li><i class="fas fa-map-marker-alt me-2"></i> Москва, ул. Авиационная, 1</li>
+                <div class="col-lg-2 col-md-4 mb-4 mb-lg-0">
+                    <h5>Дополнительно</h5>
+                    <ul>
+                        <li><a href="#">Помощь</a></li>
+                        <li><a href="#">Часто задаваемые вопросы</a></li>
+                        <li><a href="#">Условия использования</a></li>
+                        <li><a href="#">Карта сайта</a></li>
                     </ul>
                 </div>
-            </div>
-            <hr class="mt-4 mb-4" style="border-color: rgba(255,255,255,0.1);">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="mb-0">&copy; @DateTime.Now.Year Airlogistics. Все права защищены.</p>
+                <div class="col-lg-4 col-md-4">
+                    <h5>Контакты</h5>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-info">
+                            <a href="mailto:support@airlogistics.ru">support@airlogistics.ru</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-info">
+                            <a href="tel:+79991234567">+7 (999) 123-45-67</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-info">
+                            <span>Москва, ул. Авиационная, 1</span>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="copyright">
+                &copy; 2025 Airlogistics. Все права защищены.
             </div>
         </div>
     </footer>

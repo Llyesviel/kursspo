@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Airport.Data;
 using Airport.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Runtime.InteropServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,30 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Корректно настраиваем параметры жизненного цикла приложения
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.AddServerHeader = false;
+    serverOptions.AllowSynchronousIO = false;
+});
+
+// Добавляем корректную обработку процесса завершения
+builder.Services.Configure<HostOptions>(options =>
+{
+    options.ShutdownTimeout = TimeSpan.FromSeconds(10);
+});
+
 var app = builder.Build();
+
+// Регистрация обработчиков сигналов для корректного завершения приложения
+if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+{
+    AppDomain.CurrentDomain.ProcessExit += (s, e) => 
+    {
+        Console.WriteLine("Процесс завершается, освобождаем ресурсы...");
+        Thread.Sleep(500); // Даем время на освобождение ресурсов
+    };
+}
 
 // Применение миграций/создание базы данных автоматически
 using (var scope = app.Services.CreateScope())

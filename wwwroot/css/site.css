@@ -247,19 +247,125 @@ body {
 footer {
     background-color: var(--secondary-color);
     color: var(--text-light);
-    padding: 40px 0 20px;
+    padding: 60px 0 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--primary-light));
+    z-index: 2;
+}
+
+footer .footer-logo {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    display: inline-block;
+}
+
+footer .description {
+    opacity: 0.8;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+footer h5 {
+    color: var(--text-light);
+    font-weight: 600;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+footer h5::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 40px;
+    height: 2px;
+    background-color: var(--accent-color);
+}
+
+footer ul {
+    padding: 0;
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+footer ul li {
+    margin-bottom: 12px;
 }
 
 footer a {
     color: var(--text-light);
     opacity: 0.8;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
 }
 
 footer a:hover {
     color: white;
     opacity: 1;
-    text-decoration: none;
+    transform: translateX(5px);
+}
+
+footer .contact-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+footer .contact-icon {
+    margin-right: 10px;
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    min-width: 20px;
+    margin-top: 3px;
+}
+
+footer .contact-info {
+    flex: 1;
+}
+
+footer .social-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+footer .social-link {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+footer .social-link:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-3px);
+}
+
+footer .copyright {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.6;
 }
 
 /* Обновление секции с функциями */
@@ -431,22 +537,63 @@ footer a:hover {
 /* Стили для секции с призывом к действию */
 .cta-section {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    padding: 70px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    transform: translate(30%, -30%);
+}
+
+.cta-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    transform: translate(-30%, 30%);
 }
 
 .cta-section h2 {
-    margin-bottom: 0.5rem;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cta-section p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .cta-section .btn-light {
     color: var(--primary-color);
     font-weight: 600;
+    font-size: 1.1rem;
+    padding: 12px 30px;
+    border-radius: 50px;
     transition: all 0.3s ease;
     border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
 .cta-section .btn-light:hover {
     background-color: white;
     color: var(--primary-dark);
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
