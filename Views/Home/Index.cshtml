@@ -3,7 +3,7 @@
 }
 
 <!-- Hero секция -->
-<section class="hero-section">
+<section class="hero-section" id="hero-animation">
     <div class="container">
         <div class="row">
             <div class="col-md-8 mx-auto text-center">
@@ -60,8 +60,9 @@
 <section class="features-section">
     <div class="container">
         <div class="row">
-            <!-- Для неаутентифицированных пользователей показываем информацию о сервисе -->
-            @if (!User.Identity.IsAuthenticated)
+        @{
+            // Для неаутентифицированных пользователей
+            if (!User.Identity.IsAuthenticated)
             {
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 feature-card">
@@ -97,8 +98,9 @@
                     </div>
                 </div>
             }
-            <!-- Для обычных пользователей показываем доступные действия -->
-            else if (!User.IsInRole("Admin"))
+            
+            // Для обычных пользователей (не администраторов)
+            if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
             {
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 feature-card">
@@ -137,6 +139,183 @@
                     </div>
                 </div>
             }
+        }
         </div>
     </div>
-</section> 
+</section>
+
+<!-- Преимущества системы -->
+<section class="benefits-section py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Почему стоит выбрать нашу систему</h2>
+            <p class="section-subtitle">Инновационные технологии для вашего комфорта и безопасности</p>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="feature-icon-small me-3">
+                                <i class="fas fa-bolt text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Мгновенное бронирование</h4>
+                                <p class="card-text">Система позволяет мгновенно бронировать билеты без длительного ожидания подтверждения. Электронный билет будет доступен сразу после оплаты.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="feature-icon-small me-3">
+                                <i class="fas fa-shield-alt text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Безопасность данных</h4>
+                                <p class="card-text">Ваши личные данные и платежная информация надежно защищены современными методами шифрования и соответствуют международным стандартам безопасности.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="feature-icon-small me-3">
+                                <i class="fas fa-money-bill-wave text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Лучшие цены</h4>
+                                <p class="card-text">Наша система автоматически подбирает самые выгодные предложения и предоставляет рекомендации по экономии. Регулярно проводятся акции и действуют специальные предложения.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="feature-icon-small me-3">
+                                <i class="fas fa-bell text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Уведомления о рейсах</h4>
+                                <p class="card-text">Получайте своевременные уведомления об изменениях в расписании, задержках рейсов и особых условиях перелета. Будьте всегда в курсе актуальной информации.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Возможности системы -->
+<section class="capabilities-section py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Возможности нашей системы</h2>
+            <p class="section-subtitle">Полный спектр услуг для удобного управления полетами</p>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="capabilities-image">
+                    <img src="/images/capabilities.svg" alt="Возможности системы" class="img-fluid rounded shadow" onerror="this.src='/images/capabilities-placeholder.png'; this.onerror=null;">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="capabilities-list">
+                    <div class="capability-item mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="capability-icon me-3">
+                                <i class="fas fa-check-circle text-success"></i>
+                            </div>
+                            <h4 class="mb-0">Умный поиск рейсов</h4>
+                        </div>
+                        <p>Фильтрация по множеству параметров: цена, время, дата, количество пересадок и наличие мест.</p>
+                    </div>
+                    <div class="capability-item mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="capability-icon me-3">
+                                <i class="fas fa-check-circle text-success"></i>
+                            </div>
+                            <h4 class="mb-0">Онлайн-регистрация</h4>
+                        </div>
+                        <p>Регистрируйтесь на рейс онлайн и получайте посадочный талон прямо на свой электронный адрес.</p>
+                    </div>
+                    <div class="capability-item mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="capability-icon me-3">
+                                <i class="fas fa-check-circle text-success"></i>
+                            </div>
+                            <h4 class="mb-0">Трекинг статуса рейса</h4>
+                        </div>
+                        <p>Отслеживайте текущий статус рейса в реальном времени и получайте актуальную информацию о вылете.</p>
+                    </div>
+                    <div class="capability-item">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="capability-icon me-3">
+                                <i class="fas fa-check-circle text-success"></i>
+                            </div>
+                            <h4 class="mb-0">Управление бронированием</h4>
+                        </div>
+                        <p>Изменяйте, отменяйте или дополняйте бронирование прямо в личном кабинете без дополнительных обращений.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Призыв к действию -->
+<section class="cta-section py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mb-4 mb-lg-0">
+                <h2 class="fw-bold">Готовы к путешествию?</h2>
+                <p class="lead mb-0">Зарегистрируйтесь сейчас и получите доступ ко всем возможностям системы</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a asp-controller="Auth" asp-action="Register" class="btn btn-light btn-lg">Начать пользоваться</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
+{
+    <!-- Кнопка быстрого доступа "Мои билеты" -->
+    <div class="quick-access-panel">
+        <a asp-controller="Home" asp-action="MyTickets" class="quick-access-btn" title="Мои билеты">
+            <i class="fas fa-ticket-alt"></i>
+        </a>
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.cells.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            VANTA.CELLS({
+                el: "#hero-animation",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.00,
+                minWidth: 200.00,
+                scale: 1.00,
+                color1: 0x101b61,
+                color2: 0x15294d,
+                size: 1.70,
+                speed: 1.50
+            });
+        });
+    </script>
+} 

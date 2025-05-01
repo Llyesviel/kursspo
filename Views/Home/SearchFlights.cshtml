@@ -1,178 +1,232 @@
-@model IEnumerable<Flight>
+@model List<Flight>
 
 @{
     ViewData["Title"] = "Поиск рейсов";
+    
+    // Сортировка рейсов по цене (от дешевого к дорогому)
+    var sortedByPrice = Model.OrderBy(f => f.Price).ToList();
+    
+    // Определение рейса с наибольшим количеством свободных мест
+    var maxAvailableSeats = Model.Count > 0 ? Model.Max(f => f.AvailableSeats) : 0;
+    var bestAvailabilityFlight = Model.OrderByDescending(f => f.AvailableSeats).FirstOrDefault();
+    
+    // Определение самого дешевого рейса
+    var cheapestFlight = sortedByPrice.FirstOrDefault();
 }
 
 <div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="mb-3">Результаты поиска рейсов</h1>
-            <h4>Пункт назначения: @ViewBag.Destination</h4>
-            <h5>Дата вылета: @DateTime.Parse(ViewBag.DepartureDate).ToString("dd.MM.yyyy")</h5>
-        </div>
-        <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
-            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left"></i> Вернуться к поиску
-            </a>
-        </div>
-    </div>
-
+    <h1 class="mb-4">Результаты поиска рейсов</h1>
+    
     <div class="row mb-4">
         <div class="col-md-12">
-            <ul class="nav nav-pills justify-content-center">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">Дешевле</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Быстрее</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Больше</a>
-                </li>
-            </ul>
+            <div class="search-container mb-4">
+                <form asp-controller="Home" asp-action="SearchFlights" method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="departure" name="departure" placeholder="Откуда" value="@ViewBag.Departure">
+                            <label for="departure">Откуда</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="destination" name="destination" placeholder="Куда" value="@ViewBag.Destination">
+                            <label for="destination">Куда</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <input type="date" class="form-control" id="date" name="date" value="@ViewBag.DepartureDate">
+                            <label for="date">Дата вылета</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    @if (Model.Any())
-    {
-        <div class="flight-results">
-            @foreach (var item in Model)
-            {
-                <div class="flight-card">
-                    <div class="airline-logo">
-                        <img src="https://via.placeholder.com/50" alt="@item.Aircraft.Name" class="img-fluid">
-                    </div>
-                    <div class="flight-times">
-                        <div class="departure">
-                            <div class="flight-time">@item.DepartureTime.ToString("HH:mm")</div>
-                            <div class="airport">@item.FlightNumber.Substring(0, 3)</div>
-                        </div>
-                        <div class="flight-duration">
-                            <div class="duration-time">~2ч 30м</div>
-                            <div class="plane-line">
-                                <svg width="100" height="20" xmlns="http://www.w3.org/2000/svg">
-                                    <line x1="0" y1="10" x2="100" y2="10" stroke="#ddd" stroke-width="1"/>
-                                    <circle cx="50" cy="10" r="3" fill="#aaa"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="arrival">
-                            <div class="flight-time">@item.DepartureTime.AddHours(2.5).ToString("HH:mm")</div>
-                            <div class="airport">@ViewBag.Destination.ToString().Substring(0, 3).ToUpper()</div>
-                        </div>
-                    </div>
-                    <div class="flight-details">
-                        <div><strong>Рейс:</strong> @item.FlightNumber</div>
-                        <div><strong>Самолет:</strong> @item.Aircraft.Name</div>
-                        <div><strong>Места:</strong> @item.AvailableSeats / @item.Aircraft.SeatCount</div>
-                    </div>
-                    <div class="flight-price">
-                        <div>@item.Price ₽</div>
-                        <div class="d-flex mt-2 gap-2">
-                            <a href="#" class="btn btn-sm btn-outline-primary" onclick="showFlightDetails(@item.Id); return false;">
-                                <i class="fas fa-info-circle"></i> Детали
-                            </a>
-                            <a href="#" class="select-btn" onclick="showBookingForm(@item.Id); return false;">
-                                <i class="fas fa-ticket-alt"></i> Забронировать билет
-                            </a>
-                        </div>
+    <!-- Опции сортировки -->
+    <div class="sort-options mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <h5 class="mb-0">Найдено рейсов: @Model.Count</h5>
+            </div>
+            <div class="col-md-8">
+                <div class="d-flex justify-content-end">
+                    <div class="btn-group" role="group" aria-label="Сортировка">
+                        <button type="button" class="btn btn-outline-primary active" id="sort-price">По цене</button>
+                        <button type="button" class="btn btn-outline-primary" id="sort-time">По времени</button>
+                        <button type="button" class="btn btn-outline-primary" id="sort-seats">По наличию мест</button>
                     </div>
                 </div>
-            }
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> К сожалению, рейсы по вашему запросу не найдены. Попробуйте изменить параметры поиска.
         </div>
     }
     else
     {
-        <div class="alert alert-info p-4 text-center">
-            <i class="fas fa-plane-slash fa-3x mb-3"></i>
-            <h4>Рейсы не найдены</h4>
-            <p>По вашему запросу не найдено рейсов с доступными местами. Попробуйте изменить параметры поиска или выбрать другую дату.</p>
-            <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-2">Вернуться к поиску</a>
+        <!-- Рекомендации -->
+        @if (cheapestFlight != null)
+        {
+            <div class="card mb-4 best-price">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-tags me-2 text-success"></i>
+                        Рекомендуем самый выгодный рейс
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <h5 class="fw-bold">@cheapestFlight.FlightNumber</h5>
+                            <p class="mb-1">
+                                <i class="fas fa-plane-departure me-2"></i>
+                                @cheapestFlight.DepartureTime.ToString("dd.MM.yyyy HH:mm")
+                            </p>
+                            <div class="flight-tag tag-best-price">Лучшая цена</div>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-0">Свободных мест: @cheapestFlight.AvailableSeats из @cheapestFlight.Aircraft.SeatCount</p>
+                            <div class="progress mt-2">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: @(100 - (cheapestFlight.AvailableSeats * 100 / cheapestFlight.Aircraft.SeatCount))%" aria-valuenow="@(100 - (cheapestFlight.AvailableSeats * 100 / cheapestFlight.Aircraft.SeatCount))" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <h4 class="text-success fw-bold">@cheapestFlight.Price.ToString("C0")</h4>
+                        </div>
+                        <div class="col-md-2">
+                            <a asp-controller="Booking" asp-action="BookTicket" asp-route-flightId="@cheapestFlight.Id" class="btn btn-primary w-100">Выбрать</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (bestAvailabilityFlight != null && bestAvailabilityFlight.Id != cheapestFlight?.Id && bestAvailabilityFlight.AvailableSeats > 10)
+        {
+            <div class="card mb-4 best-availability">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <i class="fas fa-couch me-2 text-primary"></i>
+                        Рекомендуем рейс с наибольшим количеством свободных мест
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <h5 class="fw-bold">@bestAvailabilityFlight.FlightNumber</h5>
+                            <p class="mb-1">
+                                <i class="fas fa-plane-departure me-2"></i>
+                                @bestAvailabilityFlight.DepartureTime.ToString("dd.MM.yyyy HH:mm")
+                            </p>
+                            <div class="flight-tag tag-best-availability">Много мест</div>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-0"><strong>Свободных мест: @bestAvailabilityFlight.AvailableSeats из @bestAvailabilityFlight.Aircraft.SeatCount</strong></p>
+                            <div class="progress mt-2">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: @(100 - (bestAvailabilityFlight.AvailableSeats * 100 / bestAvailabilityFlight.Aircraft.SeatCount))%" aria-valuenow="@(100 - (bestAvailabilityFlight.AvailableSeats * 100 / bestAvailabilityFlight.Aircraft.SeatCount))" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <h4 class="fw-bold">@bestAvailabilityFlight.Price.ToString("C0")</h4>
+                        </div>
+                        <div class="col-md-2">
+                            <a asp-controller="Booking" asp-action="BookTicket" asp-route-flightId="@bestAvailabilityFlight.Id" class="btn btn-primary w-100">Выбрать</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Результаты поиска -->
+        <div id="flight-results">
+            @foreach (var flight in sortedByPrice)
+            {
+                var isCheapest = flight.Id == cheapestFlight?.Id;
+                var isBestAvailability = flight.Id == bestAvailabilityFlight?.Id && flight.AvailableSeats > 10;
+                
+                if (!isCheapest && !isBestAvailability) // Не показываем дублирующиеся рейсы
+                {
+                    <div class="card flight-card mb-3" data-price="@flight.Price" data-time="@flight.DepartureTime.Ticks" data-seats="@flight.AvailableSeats">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <h5 class="fw-bold">@flight.FlightNumber</h5>
+                                    <p class="mb-1">
+                                        <i class="fas fa-plane-departure me-2"></i>
+                                        @flight.DepartureTime.ToString("dd.MM.yyyy HH:mm")
+                                    </p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="mb-0">Свободных мест: @flight.AvailableSeats из @flight.Aircraft.SeatCount</p>
+                                    <div class="progress mt-2">
+                                        <div class="progress-bar" role="progressbar" style="width: @(100 - (flight.AvailableSeats * 100 / flight.Aircraft.SeatCount))%" aria-valuenow="@(100 - (flight.AvailableSeats * 100 / flight.Aircraft.SeatCount))" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <h4 class="fw-bold">@flight.Price.ToString("C0")</h4>
+                                </div>
+                                <div class="col-md-2">
+                                    <a asp-controller="Booking" asp-action="BookTicket" asp-route-flightId="@flight.Id" class="btn btn-primary w-100">Выбрать</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
         </div>
     }
 </div>
 
-<!-- Модальное окно с деталями рейса -->
-<div class="modal fade" id="flightDetailsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Информация о рейсе</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="flightDetailsContent">
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Загрузка...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Модальное окно бронирования -->
-<div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Бронирование билета</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="bookingContent">
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Загрузка...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section Scripts {
     <script>
-        function showFlightDetails(flightId) {
-            var modal = new bootstrap.Modal(document.getElementById('flightDetailsModal'));
-            modal.show();
-            
-            // AJAX запрос для получения деталей рейса
-            $.ajax({
-                url: '/Booking/GetFlightDetails/' + flightId,
-                type: 'GET',
-                success: function(response) {
-                    document.getElementById('flightDetailsContent').innerHTML = response;
-                },
-                error: function() {
-                    document.getElementById('flightDetailsContent').innerHTML = `
-                        <div class="alert alert-danger m-3">
-                            Ошибка при загрузке информации о рейсе.
-                        </div>
-                    `;
-                }
+        $(document).ready(function() {
+            // Сортировка по цене (по умолчанию)
+            $("#sort-price").click(function() {
+                $(this).addClass('active').siblings().removeClass('active');
+                sortFlights('price');
             });
-        }
-        
-        function showBookingForm(flightId) {
-            var modal = new bootstrap.Modal(document.getElementById('bookingModal'));
-            modal.show();
             
-            // AJAX запрос для получения формы бронирования
-            $.ajax({
-                url: '/Booking/BookingForm?flightId=' + flightId,
-                type: 'GET',
-                success: function(response) {
-                    document.getElementById('bookingContent').innerHTML = response;
-                },
-                error: function(xhr) {
-                    document.getElementById('bookingContent').innerHTML = `
-                        <div class="alert alert-danger m-3">
-                            Ошибка: ${xhr.responseText || 'Не удалось загрузить форму бронирования'}
-                        </div>
-                    `;
-                }
+            // Сортировка по времени
+            $("#sort-time").click(function() {
+                $(this).addClass('active').siblings().removeClass('active');
+                sortFlights('time');
             });
-        }
+            
+            // Сортировка по количеству свободных мест
+            $("#sort-seats").click(function() {
+                $(this).addClass('active').siblings().removeClass('active');
+                sortFlights('seats');
+            });
+            
+            function sortFlights(sortBy) {
+                var flights = $("#flight-results .flight-card").get();
+                
+                flights.sort(function(a, b) {
+                    var valueA = $(a).data(sortBy);
+                    var valueB = $(b).data(sortBy);
+                    
+                    if (sortBy === 'price' || sortBy === 'time') {
+                        return valueA - valueB; // По возрастанию
+                    } else {
+                        return valueB - valueA; // По убыванию для мест
+                    }
+                });
+                
+                $.each(flights, function(index, flight) {
+                    $("#flight-results").append(flight);
+                });
+            }
+        });
     </script>
 } 

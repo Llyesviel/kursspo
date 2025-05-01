@@ -21,7 +21,12 @@ namespace Airport.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("MainPage");
+        }
+
+        public IActionResult MainPage()
+        {
+            return View("Index");
         }
 
         public IActionResult Privacy()
@@ -30,7 +35,7 @@ namespace Airport.Controllers
         }
 
         // Поиск ближайшего рейса до заданного пункта с наличием свободных мест
-        public async Task<IActionResult> SearchFlights(string destination, DateTime? departureDate)
+        public async Task<IActionResult> SearchFlights(string departure, string destination, DateTime? departureDate)
         {
             // Если дата не указана, используем текущую дату
             if (!departureDate.HasValue)
@@ -44,11 +49,12 @@ namespace Airport.Controllers
                 .Include(f => f.Landings)
                 .Where(f => f.AvailableSeats > 0 && 
                             f.DepartureTime >= departureDate.Value &&
-                            (f.Landings.Any(l => l.Location.Contains(destination)) || 
+                            (string.IsNullOrEmpty(destination) || f.Landings.Any(l => l.Location.Contains(destination)) || 
                              f.FlightNumber.Contains(destination)))
                 .OrderBy(f => f.DepartureTime)
                 .ToListAsync();
 
+            ViewBag.Departure = departure;
             ViewBag.Destination = destination;
             ViewBag.DepartureDate = departureDate.Value.ToString("yyyy-MM-dd");
             
