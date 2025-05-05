@@ -358,12 +358,12 @@
 </section>
 
 <!-- Призыв к действию -->
-<section class="cta-section py-5 bg-primary text-white">
+<section class="cta-section py-5 text-white" id="cta-animation">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8 mb-4 mb-lg-0">
-                <h2 class="fw-bold">Готовы к путешествию?</h2>
-                <p class="lead mb-0">Зарегистрируйтесь сейчас и получите доступ ко всем возможностям системы</p>
+                <h2 class="fw-bold text-white">Готовы к путешествию?</h2>
+                <p class="lead mb-0 text-white">Зарегистрируйтесь сейчас и получите доступ ко всем возможностям системы</p>
             </div>
             <div class="col-lg-4 text-lg-end">
                 <a asp-controller="Auth" asp-action="Register" class="btn btn-light btn-lg">Начать пользоваться</a>
@@ -379,6 +379,20 @@
         document.addEventListener('DOMContentLoaded', function() {
             VANTA.CELLS({
                 el: "#hero-animation",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.00,
+                minWidth: 200.00,
+                scale: 1.00,
+                color1: 0x101b61,
+                color2: 0x15294d,
+                size: 1.70,
+                speed: 1.50
+            });
+            
+            VANTA.CELLS({
+                el: "#cta-animation",
                 mouseControls: true,
                 touchControls: true,
                 gyroControls: false,
