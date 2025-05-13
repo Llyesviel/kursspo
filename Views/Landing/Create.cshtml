@@ -9,22 +9,31 @@
 <hr />
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group mb-3">
-                <label asp-for="FlightId" class="control-label">Рейс</label>
-                <select asp-for="FlightId" class="form-control" asp-items="ViewBag.FlightId"></select>
+                <label asp-for="FlightId" class="control-label fw-bold">Рейс *</label>
+                <select asp-for="FlightId" class="form-select" asp-items="ViewBag.FlightId" required
+                        data-val="true" 
+                        data-val-required="Выберите рейс" 
+                        data-val-range="Необходимо выбрать рейс" 
+                        data-val-range-min="1">
+                    <option value="">-- Выберите рейс --</option>
+                </select>
                 <span asp-validation-for="FlightId" class="text-danger"></span>
+                <small class="form-text text-muted">Обязательное поле. Выберите рейс для посадки</small>
             </div>
             <div class="form-group mb-3">
-                <label asp-for="Location" class="control-label">Место посадки</label>
-                <input asp-for="Location" class="form-control" />
+                <label asp-for="Location" class="control-label fw-bold">Место посадки *</label>
+                <input asp-for="Location" class="form-control" required placeholder="Город" />
                 <span asp-validation-for="Location" class="text-danger"></span>
+                <small class="form-text text-muted">Укажите точное место посадки (терминал, выход и т.д.)</small>
             </div>
             <div class="form-group mb-3">
-                <label asp-for="Time" class="control-label">Время посадки</label>
-                <input asp-for="Time" class="form-control" type="datetime-local" step="60" />
+                <label asp-for="Time" class="control-label fw-bold">Время посадки *</label>
+                <input asp-for="Time" class="form-control" type="datetime-local" step="60" required />
                 <span asp-validation-for="Time" class="text-danger"></span>
+                <small class="form-text text-muted">Время посадки должно быть позже времени вылета рейса</small>
             </div>
             <div class="form-group">
                 <input type="submit" value="Сохранить" class="btn btn-primary" />
@@ -36,4 +45,20 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Дополнительная клиентская валидация
+            $.validator.addMethod("validFlightId", function(value, element) {
+                return value && parseInt(value) > 0;
+            }, "Выберите рейс из списка");
+            
+            // Применяем метод валидации к полю FlightId
+            $("form").validate().settings.rules["FlightId"] = { 
+                validFlightId: true,
+                required: true,
+                min: 1
+            };
+        });
+    </script>
 } 

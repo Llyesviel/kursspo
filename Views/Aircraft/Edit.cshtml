@@ -9,27 +9,37 @@
 <hr />
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Edit">
+        <form asp-action="Edit" id="editAircraftForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group mb-3">
-                <label asp-for="Name" class="control-label">Название</label>
-                <input asp-for="Name" class="form-control" />
+                <label asp-for="Name" class="control-label fw-bold">Название *</label>
+                <input asp-for="Name" class="form-control" required placeholder="Например, Boeing 747" />
                 <span asp-validation-for="Name" class="text-danger"></span>
+                <small class="form-text text-muted">Обязательное поле. Укажите полное название модели самолета.</small>
             </div>
             <div class="form-group mb-3">
-                <label asp-for="Category" class="control-label">Категория</label>
-                <input asp-for="Category" class="form-control" />
+                <label asp-for="Category" class="control-label fw-bold">Категория *</label>
+                <input asp-for="Category" class="form-control" required placeholder="Например, Пассажирский" />
                 <span asp-validation-for="Category" class="text-danger"></span>
+                <small class="form-text text-muted">Обязательное поле. Укажите категорию или производителя самолета.</small>
             </div>
             <div class="form-group mb-3">
-                <label asp-for="SeatCount" class="control-label">Количество мест</label>
-                <input asp-for="SeatCount" class="form-control" />
+                <label asp-for="SeatCount" class="control-label fw-bold">Количество мест *</label>
+                <input asp-for="SeatCount" class="form-control" required min="1" type="number"
+                       oninvalid="this.setCustomValidity('Введите значение больше или равное 1')" 
+                       oninput="this.setCustomValidity('')"
+                       title="Введите значение больше или равное 1" />
                 <span asp-validation-for="SeatCount" class="text-danger"></span>
+                <small class="form-text text-muted">Обязательное поле. Укажите общее количество пассажирских мест.</small>
             </div>
             <div class="form-group">
-                <input type="submit" value="Сохранить" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
+                <button type="submit" id="submitButton" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Сохранить
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Назад к списку
+                </a>
             </div>
         </form>
     </div>
@@ -37,4 +47,49 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Подсветка обязательных полей
+            $('input[required]').addClass('border-primary');
+            
+            // Дополнительная настройка сообщений валидации для числовых полей
+            $('input[type="number"]').each(function() {
+                $(this).on('invalid', function(e) {
+                    if (this.validity.rangeUnderflow) {
+                        this.setCustomValidity('Введите значение больше или равное 1');
+                    }
+                });
+            });
+            
+            // Обработка отправки формы
+            $('#editAircraftForm').on('submit', function(e) {
+                var form = $(this);
+                
+                if (!form[0].checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Не активируем индикатор загрузки при ошибке валидации
+                    return false;
+                }
+                
+                console.log('Форма отправляется на сервер...');
+                console.log('Название: ' + $('#Name').val());
+                console.log('Категория: ' + $('#Category').val());
+                console.log('Количество мест: ' + $('#SeatCount').val());
+                
+                // Показываем индикатор загрузки
+                $('#submitButton').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Сохранение...');
+                
+                // При неудачной валидации на сервере вернем кнопку в исходное состояние
+                setTimeout(function() {
+                    if ($('.validation-summary-errors, .field-validation-error').length > 0) {
+                        $('#submitButton').prop('disabled', false).html('<i class="fas fa-save me-2"></i>Сохранить');
+                    }
+                }, 500);
+                
+                return true;
+            });
+        });
+    </script>
 } 
