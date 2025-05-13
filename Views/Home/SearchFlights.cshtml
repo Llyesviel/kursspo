@@ -22,20 +22,45 @@
             <div class="search-container mb-4">
                 <form asp-controller="Home" asp-action="SearchFlights" method="get" class="row g-3">
                     <div class="col-md-4">
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="departure" name="departure" placeholder="Откуда" value="@ViewBag.Departure">
+                        <div class="form-floating position-relative">
+                            <input type="text" class="form-control" id="departure" name="departure" placeholder="Откуда" value="@ViewBag.Departure" list="departureOptions">
                             <label for="departure">Откуда</label>
+                            <datalist id="departureOptions">
+                                <option value="Москва"></option>
+                                <option value="Санкт-Петербург"></option>
+                                <option value="Казань"></option>
+                                <option value="Новосибирск"></option>
+                                <option value="Екатеринбург"></option>
+                                <option value="Сочи"></option>
+                                <option value="Краснодар"></option>
+                                <option value="Калининград"></option>
+                            </datalist>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="destination" name="destination" placeholder="Куда" value="@ViewBag.Destination">
+                    <div class="col-md-1 d-flex align-items-center justify-content-center">
+                        <button type="button" class="btn btn-outline-secondary exchange-btn" onclick="exchangeAirports()">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating position-relative">
+                            <input type="text" class="form-control" id="destination" name="destination" placeholder="Куда" value="@ViewBag.Destination" list="destinationOptions">
                             <label for="destination">Куда</label>
+                            <datalist id="destinationOptions">
+                                <option value="Москва"></option>
+                                <option value="Санкт-Петербург"></option>
+                                <option value="Казань"></option>
+                                <option value="Новосибирск"></option>
+                                <option value="Екатеринбург"></option>
+                                <option value="Сочи"></option>
+                                <option value="Краснодар"></option>
+                                <option value="Калининград"></option>
+                            </datalist>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-floating">
-                            <input type="date" class="form-control" id="date" name="date" value="@ViewBag.DepartureDate">
+                            <input type="date" class="form-control" id="date" name="date" value="@ViewBag.DepartureDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="2030-12-31">
                             <label for="date">Дата вылета</label>
                         </div>
                     </div>
@@ -46,6 +71,26 @@
                     </div>
                 </form>
             </div>
+            
+            @if (User?.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
+            {
+                <div class="text-center mt-3 user-quick-actions mb-4">
+                    <a asp-controller="Booking" asp-action="MyTickets" class="btn btn-outline-primary mx-2">
+                        <i class="fas fa-ticket-alt me-2"></i>Мои билеты
+                    </a>
+                    <a asp-controller="Booking" asp-action="FlightHistory" class="btn btn-outline-primary mx-2">
+                        <i class="fas fa-history me-2"></i>История перелетов
+                    </a>
+                </div>
+            }
+            else if (User?.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                <div class="text-center mt-3 mb-4">
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Войдите, чтобы увидеть свои билеты
+                    </a>
+                </div>
+            }
         </div>
     </div>
 
@@ -82,13 +127,20 @@
                 <div class="card-header bg-light">
                     <h5 class="mb-0 d-flex align-items-center">
                         <i class="fas fa-tags me-2 text-success"></i>
-                        Рекомендуем самый выгодный рейс
+                        Рекомендуем самый выгодный рейс <span class="ms-2 fs-6 text-muted">@ViewBag.Departure → @ViewBag.Destination</span>
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-md-4">
                             <h5 class="fw-bold">@cheapestFlight.FlightNumber</h5>
+                            <div class="flight-route mb-2">
+                                <span class="city-code">@ViewBag.Departure</span>
+                                <div class="flight-line">
+                                    <i class="fas fa-plane"></i>
+                                </div>
+                                <span class="city-code">@ViewBag.Destination</span>
+                            </div>
                             <p class="mb-1">
                                 <i class="fas fa-plane-departure me-2"></i>
                                 @cheapestFlight.DepartureTime.ToString("dd.MM.yyyy HH:mm")
@@ -118,13 +170,20 @@
                 <div class="card-header bg-light">
                     <h5 class="mb-0 d-flex align-items-center">
                         <i class="fas fa-couch me-2 text-primary"></i>
-                        Рекомендуем рейс с наибольшим количеством свободных мест
+                        Рекомендуем рейс с наибольшим количеством свободных мест <span class="ms-2 fs-6 text-muted">@ViewBag.Departure → @ViewBag.Destination</span>
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-md-4">
                             <h5 class="fw-bold">@bestAvailabilityFlight.FlightNumber</h5>
+                            <div class="flight-route mb-2">
+                                <span class="city-code">@ViewBag.Departure</span>
+                                <div class="flight-line">
+                                    <i class="fas fa-plane"></i>
+                                </div>
+                                <span class="city-code">@ViewBag.Destination</span>
+                            </div>
                             <p class="mb-1">
                                 <i class="fas fa-plane-departure me-2"></i>
                                 @bestAvailabilityFlight.DepartureTime.ToString("dd.MM.yyyy HH:mm")
@@ -165,6 +224,10 @@
                                     <p class="mb-1">
                                         <i class="fas fa-plane-departure me-2"></i>
                                         @flight.DepartureTime.ToString("dd.MM.yyyy HH:mm")
+                                    </p>
+                                    <p class="mb-1">
+                                        <i class="fas fa-map-marker-alt me-2"></i>
+                                        <span class="fw-bold">@ViewBag.Departure</span> → <span class="fw-bold">@ViewBag.Destination</span>
                                     </p>
                                 </div>
                                 <div class="col-md-4">
@@ -227,6 +290,46 @@
                     $("#flight-results").append(flight);
                 });
             }
+            
+            // Функция для обмена городами
+            window.exchangeAirports = function() {
+                const departure = document.getElementById('departure');
+                const destination = document.getElementById('destination');
+                const temp = departure.value;
+                
+                departure.value = destination.value;
+                destination.value = temp;
+            };
+            
+            // Валидация формы поиска (запрет на одинаковые города)
+            $('form[asp-controller="Home"][asp-action="SearchFlights"]').on('submit', function(e) {
+                const departure = $('#departure').val().trim();
+                const destination = $('#destination').val().trim();
+                
+                if (departure === destination && departure !== '') {
+                    e.preventDefault();
+                    alert('Города отправления и прибытия не могут быть одинаковыми!');
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Проверка при изменении значений полей
+            $('#departure, #destination').on('change', function() {
+                const departure = $('#departure').val().trim();
+                const destination = $('#destination').val().trim();
+                
+                if (departure === destination && departure !== '') {
+                    $(this).addClass('is-invalid');
+                    if (!$(this).next('.invalid-feedback').length) {
+                        $(this).after('<div class="invalid-feedback">Города отправления и прибытия не могут быть одинаковыми!</div>');
+                    }
+                } else {
+                    $('#departure, #destination').removeClass('is-invalid');
+                    $('.invalid-feedback').remove();
+                }
+            });
         });
     </script>
 } 

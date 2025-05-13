@@ -281,25 +281,9 @@ namespace Airport.Controllers
             }
 
             var user = await _context.Users
+                .Include(u => u.Tickets)
                 .FirstOrDefaultAsync(m => m.Id == id);
                 
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return View(user);
-        }
-        
-        // POST: Admin/DeleteUser/5
-        [HttpPost, ActionName("DeleteUser")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteUserConfirmed(int id)
-        {
-            var user = await _context.Users
-                .Include(u => u.Tickets) // Явно загружаем связанные билеты
-                .FirstOrDefaultAsync(u => u.Id == id);
-            
             if (user == null)
             {
                 return NotFound();
@@ -308,8 +292,8 @@ namespace Airport.Controllers
             // Проверяем, не пытается ли администратор удалить самого себя
             if (User.Identity.Name == user.Username)
             {
-                ModelState.AddModelError(string.Empty, "Вы не можете удалить свою собственную учетную запись.");
-                return View("DeleteUser", user);
+                TempData["ErrorMessage"] = "Вы не можете удалить свою собственную учетную запись.";
+                return RedirectToAction(nameof(Users));
             }
             
             int ticketsCount = 0;
@@ -333,14 +317,22 @@ namespace Airport.Controllers
                 }
                 
                 TempData["SuccessMessage"] = successMessage;
-                
-                return RedirectToAction(nameof(Users));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, $"Произошла ошибка при удалении: {ex.Message}");
-                return View("DeleteUser", user);
+                TempData["ErrorMessage"] = $"Произошла ошибка при удалении: {ex.Message}";
             }
+            
+            return RedirectToAction(nameof(Users));
+        }
+        
+        // POST: Admin/DeleteUser/5 - obsolete
+        [HttpPost, ActionName("DeleteUser")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteUserConfirmed(int id)
+        {
+            // Перенаправляем на GET метод выше
+            return RedirectToAction(nameof(DeleteUser), new { id });
         }
     }
 } 

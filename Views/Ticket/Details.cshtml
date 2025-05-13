@@ -4,56 +4,118 @@
     ViewData["Title"] = "Детали билета";
 }
 
-<h1>Детали билета</h1>
-
-<div>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">
-            № кассы
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.CashboxNumber)
-        </dd>
-        <dt class="col-sm-3">
-            № рейса
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Flight.FlightNumber)
-        </dd>
-        <dt class="col-sm-3">
-            Время вылета рейса
-        </dt>
-        <dd class="col-sm-9">
-            @Model.Flight.DepartureTime.ToString("dd.MM.yyyy HH:mm")
-        </dd>
-        <dt class="col-sm-3">
-            Самолет
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Flight.Aircraft.Name)
-        </dd>
-        <dt class="col-sm-3">
-            Дата продажи
-        </dt>
-        <dd class="col-sm-9">
-            @Model.Date.ToString("dd.MM.yyyy")
-        </dd>
-        <dt class="col-sm-3">
-            Время продажи
-        </dt>
-        <dd class="col-sm-9">
-            @Model.Time.ToString(@"hh\:mm")
-        </dd>
-        <dt class="col-sm-3">
-            Цена билета
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Flight.Price)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a>
-    <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2><i class="fas fa-ticket-alt me-2"></i>Детали билета</h2>
+                <div>
+                    <span class="badge bg-light text-primary">№ @Model.TicketNumber</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="flight-route mb-4">
+                        <span class="city-code">@ViewData["DepartureCity"]</span>
+                        <div class="flight-line">
+                            <i class="fas fa-plane"></i>
+                        </div>
+                        <span class="city-code">@ViewData["ArrivalCity"]</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-block">
+                        <h5 class="info-title"><i class="fas fa-info-circle me-2"></i>Информация о рейсе</h5>
+                        <dl class="row">
+                            <dt class="col-sm-4">№ рейса</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.Flight.FlightNumber)</dd>
+                            
+                            <dt class="col-sm-4">Время вылета</dt>
+                            <dd class="col-sm-8">@Model.Flight.DepartureTime.ToString("dd.MM.yyyy HH:mm")</dd>
+                            
+                            <dt class="col-sm-4">Место</dt>
+                            <dd class="col-sm-8"><span class="badge bg-primary">@Model.SeatNumber</span></dd>
+                        </dl>
+                    </div>
+                    
+                    <div class="info-block mt-4">
+                        <h5 class="info-title"><i class="fas fa-plane me-2"></i>Информация о самолете</h5>
+                        <div class="aircraft-info">
+                            <p><strong>@Html.DisplayFor(model => model.Flight.Aircraft.Name)</strong></p>
+                            <p><i class="fas fa-tag me-2"></i>Категория: @Html.DisplayFor(model => model.Flight.Aircraft.Category)</p>
+                            <p><i class="fas fa-chair me-2"></i>Вместимость: @Html.DisplayFor(model => model.Flight.Aircraft.SeatCount) мест</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="info-block">
+                        <h5 class="info-title"><i class="fas fa-receipt me-2"></i>Информация о покупке</h5>
+                        <dl class="row">
+                            <dt class="col-sm-4">№ кассы</dt>
+                            <dd class="col-sm-8">@Html.DisplayFor(model => model.CashboxNumber)</dd>
+                            
+                            <dt class="col-sm-4">Дата продажи</dt>
+                            <dd class="col-sm-8">@Model.Date.ToString("dd.MM.yyyy")</dd>
+                            
+                            <dt class="col-sm-4">Время продажи</dt>
+                            <dd class="col-sm-8">@Model.Time.ToString(@"hh\:mm")</dd>
+                            
+                            <dt class="col-sm-4">Цена билета</dt>
+                            <dd class="col-sm-8"><strong class="text-success">@Model.Flight.Price.ToString("C0")</strong></dd>
+                            
+                            <dt class="col-sm-4">Способ покупки</dt>
+                            <dd class="col-sm-8">
+                                @if (Model.PurchaseSource == "Online")
+                                {
+                                    <span class="badge bg-info">Онлайн</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Офлайн</span>
+                                }
+                            </dd>
+                            
+                            <dt class="col-sm-4">Статус</dt>
+                            <dd class="col-sm-8">
+                                @switch(Model.Status)
+                                {
+                                    case "Booked":
+                                        <span class="badge bg-warning">Забронирован</span>
+                                        break;
+                                    case "Paid":
+                                        <span class="badge bg-success">Оплачен</span>
+                                        break;
+                                    case "CheckedIn":
+                                        <span class="badge bg-primary">Регистрация пройдена</span>
+                                        break;
+                                    case "Cancelled":
+                                        <span class="badge bg-danger">Отменен</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-secondary">@Model.Status</span>
+                                        break;
+                                }
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-footer">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Редактировать
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Назад к списку
+            </a>
+        </div>
+    </div>
 </div> 

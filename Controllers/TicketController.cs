@@ -36,11 +36,20 @@ namespace Airport.Controllers
 
             var ticket = await _context.Tickets
                 .Include(t => t.Flight)
+                .Include(t => t.Flight.Aircraft)
+                .Include(t => t.Flight.Departures)
+                .Include(t => t.Flight.Landings)
                 .FirstOrDefaultAsync(m => m.Id == id);
+                
             if (ticket == null)
             {
                 return NotFound();
             }
+
+            // Устанавливаем данные о городах отправления и прибытия
+            // Пример данных (в реальном приложении это должно приходить из базы данных)
+            ViewData["DepartureCity"] = ticket.Flight.Departures.FirstOrDefault()?.Location ?? "Москва";
+            ViewData["ArrivalCity"] = ticket.Flight.Landings.FirstOrDefault()?.Location ?? "Санкт-Петербург";
 
             return View(ticket);
         }

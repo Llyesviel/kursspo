@@ -777,3 +777,117 @@ footer .copyright {
         margin: 5px 0;
     }
 }
+
+/* Стили для отображения маршрута в карточке рейса */
+.flight-route {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 15px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 10px 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.city-code {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    min-width: 70px;
+}
+
+.flight-line {
+    flex-grow: 1;
+    height: 2px;
+    background-color: #ddd;
+    margin: 0 10px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flight-line i {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    background-color: white;
+    padding: 5px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    transform: rotate(90deg);
+}
+
+@media (max-width: 767px) {
+    .flight-route {
+        padding: 8px 10px;
+    }
+    
+    .city-code {
+        font-size: 1rem;
+        min-width: 60px;
+    }
+    
+    .flight-line i {
+        font-size: 1rem;
+        padding: 4px;
+    }
+}
+
+/* Стили для блока информации о самолете в деталях билета */
+.aircraft-info {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid var(--primary-color);
+}
+
+.aircraft-info p {
+    margin-bottom: 8px;
+}
+
+.aircraft-info i {
+    color: var(--primary-color);
+}
+
+.aircraft-info strong {
+    font-size: 1.1rem;
+    color: var(--primary-dark);
+}
+
+/* Стили для блоков информации в деталях билета */
+.info-block {
+    margin-bottom: 20px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.info-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.info-block dl {
+    margin-bottom: 0;
+}
+
+.info-block dt {
+    font-weight: 600;
+    color: #555;
+}
+
+.info-block dd {
+    margin-bottom: 10px;
+}
+
+.info-block .badge {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+}
