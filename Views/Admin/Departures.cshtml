@@ -3,61 +3,110 @@
 
 @{
     ViewData["Title"] = "Вылеты";
+    Layout = "_AdminLayout";
 }
 
-<h1>Вылеты</h1>
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1>@ViewData["Title"]</h1>
+    <div>
+        <a asp-action="CreateDeparture" class="admin-btn admin-btn-primary">
+            <i class="fas fa-plus-circle"></i> Добавить вылет
+        </a>
+    </div>
+</div>
 
 @if (ViewBag.FlightInfo != null)
 {
-    <h4>@ViewBag.FlightInfo</h4>
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i> @ViewBag.FlightInfo
+    </div>
 }
 
-<p>
-    <a asp-action="CreateDeparture" class="btn btn-primary">Добавить вылет</a>
-</p>
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h5 class="admin-card-title">Список вылетов</h5>
+    </div>
+    <div class="admin-card-body p-0">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Рейс</th>
+                    <th>Место</th>
+                    <th>Время вылета</th>
+                    <th class="text-end">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (item.Flight != null)
+                            {
+                                @($"{item.Flight.FlightNumber} ({item.Flight.Aircraft?.Name})")
+                            }
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Location)
+                        </td>
+                        <td>
+                            @item.Time.ToString("HH:mm")
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="EditDeparture" asp-route-id="@item.Id" class="admin-btn admin-btn-sm admin-btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="admin-btn admin-btn-sm admin-btn-danger" onclick="confirmDelete(@item.Id)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="text-center py-3">Нет данных</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Рейс</th>
-            <th>Место</th>
-            <th>Время вылета</th>
-            <th>Действия</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @if (item.Flight != null)
-                    {
-                        @($"{item.Flight.FlightNumber} ({item.Flight.Aircraft?.Name})")
-                    }
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Location)
-                </td>
-                <td>
-                    @item.Time.ToString("HH:mm")
-                </td>
-                <td>
-                    <a asp-action="EditDeparture" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Изменить</a>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(@item.Id)">Удалить</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<!-- Modal для подтверждения удаления -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы уверены, что хотите удалить этот вылет?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="admin-btn admin-btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" id="confirmDeleteBtn" class="admin-btn admin-btn-danger">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
+        let deleteId = 0;
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        
         function confirmDelete(id) {
-            if (confirm('Вы уверены, что хотите удалить этот вылет?')) {
-                $.post('@Url.Action("DeleteDeparture")', { id: id }, function() {
-                    location.reload();
-                });
-            }
+            deleteId = id;
+            deleteModal.show();
         }
+        
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            $.post('@Url.Action("DeleteDeparture")', { id: deleteId }, function() {
+                location.reload();
+            });
+            deleteModal.hide();
+        });
     </script>
 } 

@@ -141,7 +141,18 @@ namespace Airport.Controllers
         }
 
         // GET: Admin/Departures
-        public IActionResult Departures(int? id)
+        public async Task<IActionResult> Departures()
+        {
+            var departures = await _context.Departures
+                .Include(d => d.Flight)
+                .ThenInclude(f => f.Aircraft)
+                .ToListAsync();
+
+            return View(departures);
+        }
+
+        // GET: Admin/FlightDepartures/5
+        public IActionResult FlightDepartures(int? id)
         {
             if (id == null)
             {
@@ -166,7 +177,7 @@ namespace Airport.Controllers
                 .Include(d => d.Flight)
                 .ToList();
 
-            return View(departures);
+            return View("Departures", departures);
         }
 
         // GET: Admin/CreateDeparture
@@ -185,7 +196,7 @@ namespace Airport.Controllers
             {
                 _context.Add(departure);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Departures));
+                return RedirectToAction("Index", "Departure");
             }
             ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
             return View(departure);
@@ -236,7 +247,7 @@ namespace Airport.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Departures));
+                return RedirectToAction("Index", "Departure");
             }
             ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
             return View(departure);
@@ -252,7 +263,7 @@ namespace Airport.Controllers
                 _context.Departures.Remove(departure);
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(Departures));
+            return RedirectToAction("Index", "Departure");
         }
 
         private bool DepartureExists(int id)

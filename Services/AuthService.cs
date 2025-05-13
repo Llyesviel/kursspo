@@ -12,6 +12,8 @@ namespace Airport.Services
         Task<User> RegisterAsync(RegisterViewModel model);
         Task<User> LoginAsync(LoginViewModel model);
         Task<bool> UserExistsAsync(string email);
+        Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
+        Task<User> UpdateProfileAsync(int userId, EditProfileViewModel model);
     }
 
     public class AuthService : IAuthService
@@ -100,6 +102,71 @@ namespace Airport.Services
             }
 
             return await _context.Users.AnyAsync(u => u.Email == email);
+        }
+
+        public async Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        {
+            if (string.IsNullOrEmpty(currentPassword))
+            {
+                throw new ArgumentException("Текущий пароль не может быть пустым");
+            }
+
+            if (string.IsNullOrEmpty(newPassword))
+            {
+                throw new ArgumentException("Новый пароль не может быть пустым");
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                throw new Exception("Пользователь не найден");
+            }
+
+            if (!VerifyPassword(currentPassword, user.PasswordHash))
+            {
+                throw new Exception("Текущий пароль указан неверно");
+            }
+
+            user.PasswordHash = HashPassword(newPassword);
+            await _context.SaveChangesAsync();
+            
+            return true;
+        }
+
+        public async Task<User> UpdateProfileAsync(int userId, EditProfileViewModel model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            if (string.IsNullOrEmpty(model.Email))
+            {
+                throw new ArgumentException("Email не может быть пустым", nameof(model.Email));
+            }
+
+            if (string.IsNullOrEmpty(model.Username))
+            {
+                throw new ArgumentException("Имя пользователя не может быть пустым", nameof(model.Username));
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                throw new Exception("Пользователь не найден");
+            }
+
+            // Проверяем, не занят ли email другим пользователем, если он был изменен
+            if (user.Email != model.Email && await _context.Users.AnyAsync(u => u.Email == model.Email && u.Id != userId))
+            {
+                throw new Exception("Пользователь с таким email уже существует");
+            }
+
+            user.Username = model.Username;
+            user.Email = model.Email;
+
+            await _context.SaveChangesAsync();
+            return user;
         }
 
         private string HashPassword(string password)

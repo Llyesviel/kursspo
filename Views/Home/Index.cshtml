@@ -414,6 +414,36 @@
                 departure.value = destination.value;
                 destination.value = temp;
             };
+            
+            // Валидация формы поиска (запрет на одинаковые города)
+            $('form[asp-controller="Home"][asp-action="SearchFlights"]').on('submit', function(e) {
+                const departure = $('#departure').val().trim();
+                const destination = $('#destination').val().trim();
+                
+                if (departure === destination && departure !== '') {
+                    e.preventDefault();
+                    alert('Города отправления и прибытия не могут быть одинаковыми!');
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Проверка при изменении значений полей
+            $('#departure, #destination').on('change', function() {
+                const departure = $('#departure').val().trim();
+                const destination = $('#destination').val().trim();
+                
+                if (departure === destination && departure !== '') {
+                    $(this).addClass('is-invalid');
+                    if (!$(this).next('.invalid-feedback').length) {
+                        $(this).after('<div class="invalid-feedback">Города отправления и прибытия не могут быть одинаковыми!</div>');
+                    }
+                } else {
+                    $('#departure, #destination').removeClass('is-invalid');
+                    $('.invalid-feedback').remove();
+                }
+            });
         });
     </script>
 } 
