@@ -37,5 +37,6 @@ namespace Airport.Models
         
         // Навигационные свойства
         public Flight Flight { get; set; } = null!;
+        public User? User { get; set; }
     }
 } 

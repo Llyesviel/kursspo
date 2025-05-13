@@ -6,6 +6,7 @@ using Airport.Data;
 using Airport.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace Airport.Controllers
 {
@@ -269,6 +270,77 @@ namespace Airport.Controllers
         private bool DepartureExists(int id)
         {
             return _context.Departures.Any(e => e.Id == id);
+        }
+        
+        // GET: Admin/DeleteUser/5
+        public async Task<IActionResult> DeleteUser(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+                
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
+        
+        // POST: Admin/DeleteUser/5
+        [HttpPost, ActionName("DeleteUser")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteUserConfirmed(int id)
+        {
+            var user = await _context.Users
+                .Include(u => u.Tickets) // Явно загружаем связанные билеты
+                .FirstOrDefaultAsync(u => u.Id == id);
+            
+            if (user == null)
+            {
+                return NotFound();
+            }
+            
+            // Проверяем, не пытается ли администратор удалить самого себя
+            if (User.Identity.Name == user.Username)
+            {
+                ModelState.AddModelError(string.Empty, "Вы не можете удалить свою собственную учетную запись.");
+                return View("DeleteUser", user);
+            }
+            
+            int ticketsCount = 0;
+            
+            // Проверяем и удаляем связанные записи
+            if (user.Tickets != null && user.Tickets.Any())
+            {
+                ticketsCount = user.Tickets.Count;
+                _context.Tickets.RemoveRange(user.Tickets);
+            }
+            
+            try
+            {
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+                
+                var successMessage = $"Пользователь {user.Username} успешно удален из системы.";
+                if (ticketsCount > 0)
+                {
+                    successMessage += $" Также удалено связанных билетов: {ticketsCount}.";
+                }
+                
+                TempData["SuccessMessage"] = successMessage;
+                
+                return RedirectToAction(nameof(Users));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Произошла ошибка при удалении: {ex.Message}");
+                return View("DeleteUser", user);
+            }
         }
     }
 } 

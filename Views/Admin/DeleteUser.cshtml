@@ -1,0 +1,83 @@
+@model User
+
+@{
+    ViewData["Title"] = "Удаление пользователя";
+    Layout = "_AdminLayout";
+}
+
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1>Удаление пользователя</h1>
+    <div>
+        <a asp-controller="Admin" asp-action="Users" class="admin-btn admin-btn-primary">
+            <i class="fas fa-arrow-left"></i> Назад к списку
+        </a>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header bg-danger text-white">
+        <h5 class="admin-card-title">Вы уверены, что хотите удалить этого пользователя?</h5>
+    </div>
+    <div class="admin-card-body">
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> Внимание! Это действие нельзя отменить. При удалении пользователя также будут удалены все связанные с ним данные (билеты, бронирования и т.д.).
+        </div>
+
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <div class="mb-3">
+            <h5>Информация о пользователе:</h5>
+            <table class="table">
+                <tr>
+                    <th>ID:</th>
+                    <td>@Model.Id</td>
+                </tr>
+                <tr>
+                    <th>Имя пользователя:</th>
+                    <td>@Model.Username</td>
+                </tr>
+                <tr>
+                    <th>Email:</th>
+                    <td>@Model.Email</td>
+                </tr>
+                <tr>
+                    <th>Роль:</th>
+                    <td>
+                        @if (Model.Role == "Admin")
+                        {
+                            <span class="badge bg-danger">Администратор</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-primary">Пользователь</span>
+                        }
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <form asp-action="DeleteUser" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="admin-btn admin-btn-danger" id="deleteButton">
+                    <i class="fas fa-trash"></i> Удалить
+                </button>
+                <a asp-controller="Admin" asp-action="Users" class="admin-btn admin-btn-secondary">
+                    <i class="fas fa-times"></i> Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('deleteButton').addEventListener('click', function(e) {
+                if (!confirm('ВНИМАНИЕ: Вы собираетесь удалить учетную запись пользователя "@Model.Username". Все данные, связанные с этим пользователем, будут безвозвратно удалены. Вы уверены?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+} 

@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System;
+using System.Collections.Generic;
 
 namespace Airport.Models
 {
@@ -20,5 +22,8 @@ namespace Airport.Models
 
         public string Role { get; set; } = "User";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // Навигационное свойство для связанных билетов
+        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
 } 

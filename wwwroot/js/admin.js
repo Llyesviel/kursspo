@@ -49,5 +49,27 @@ function confirmDelete(url, name) {
         confirmBtn.onclick = function() {
             window.location.href = this.getAttribute('data-url');
         };
+    } else {
+        // Если модального окна нет, используем обычный confirm
+        if (confirm(`Вы уверены, что хотите удалить "${name}"? Это действие нельзя будет отменить!`)) {
+            window.location.href = url;
+        }
+    }
+}
+
+// Специальная функция для подтверждения удаления пользователя
+function confirmDeleteUser(userId, username) {
+    // Проверяем, существует ли функция showUserDeleteConfirmation от модального окна
+    if (typeof showUserDeleteConfirmation === 'function') {
+        // Если модальное окно доступно, используем его
+        showUserDeleteConfirmation(userId, username);
+    } else {
+        // Иначе используем стандартный confirm
+        const message = `ВНИМАНИЕ! Вы уверены, что хотите удалить учетную запись пользователя "${username}"? 
+Это действие нельзя будет отменить, и все данные, связанные с этим пользователем, будут удалены!`;
+        
+        if (confirm(message)) {
+            window.location.href = `/Admin/DeleteUser/${userId}`;
+        }
     }
 } 

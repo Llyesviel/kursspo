@@ -2,25 +2,39 @@
 <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="deleteConfirmationModalLabel">Подтверждение удаления</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Вы уверены, что хотите удалить этот элемент?</p>
+                <div class="alert alert-warning mb-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i> <span id="deleteWarningText">Внимание! Это действие нельзя отменить!</span>
+                </div>
+                <p id="deleteConfirmationText">Вы уверены, что хотите удалить этот элемент?</p>
+                <div id="deleteItemDetails" class="d-none">
+                    <!-- Сюда можно динамически добавлять подробности об удаляемом элементе -->
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Удалить</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton">
+                    <i class="fas fa-trash me-2"></i>Да, удалить
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    function showDeleteConfirmation(deleteUrl) {
+    // Обычное подтверждение удаления
+    function showDeleteConfirmation(deleteUrl, itemName = 'этот элемент', warningText = 'Внимание! Это действие нельзя отменить!') {
         var confirmBtn = document.getElementById('confirmDeleteButton');
+        var confirmText = document.getElementById('deleteConfirmationText');
+        var warningTextElement = document.getElementById('deleteWarningText');
+        
         confirmBtn.setAttribute('data-url', deleteUrl);
+        confirmText.textContent = `Вы уверены, что хотите удалить ${itemName}?`;
+        warningTextElement.textContent = warningText;
         
         var modal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
         modal.show();
@@ -28,5 +42,14 @@
         confirmBtn.onclick = function() {
             window.location.href = this.getAttribute('data-url');
         };
+    }
+    
+    // Специализированное подтверждение для удаления пользователя
+    function showUserDeleteConfirmation(userId, username) {
+        var deleteUrl = `/Admin/DeleteUser/${userId}`;
+        var itemName = `пользователя "${username}"`;
+        var warningText = 'ВНИМАНИЕ! При удалении учетной записи будут удалены все связанные данные (билеты, бронирования и др.)!';
+        
+        showDeleteConfirmation(deleteUrl, itemName, warningText);
     }
 </script> 
