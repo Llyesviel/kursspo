@@ -29,11 +29,12 @@ namespace Airport.Controllers
         {
             base.OnActionExecuted(context);
             
-            // Сохраняем уведомления между запросами, если они есть
-            if (TempData.ContainsKey("Notifications"))
-            {
-                TempData.Keep("Notifications");
-            }
+            // Больше не сохраняем уведомления между запросами
+            // Закомментировано, чтобы уведомления показывались только один раз
+            // if (TempData.ContainsKey("Notifications"))
+            // {
+            //     TempData.Keep("Notifications");
+            // }
         }
 
         protected void AddNotification(string title, string message, NotificationService.NotificationType type, bool isDismissible = true)

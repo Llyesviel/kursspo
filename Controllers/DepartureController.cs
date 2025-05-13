@@ -78,12 +78,17 @@ namespace Airport.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Location,Time,FlightId")] Departure departure)
         {
+            Console.WriteLine($"=== НАЧАЛО СОЗДАНИЯ ВЫЛЕТА ===");
+            Console.WriteLine($"Получены данные: ID={departure.Id}, Местоположение={departure.Location}, Время={departure.Time}, FlightId={departure.FlightId}");
+            
             if (!ModelState.IsValid)
             {
+                Console.WriteLine("Ошибки валидации модели:");
                 foreach (var state in ModelState)
                 {
                     foreach (var error in state.Value.Errors)
                     {
+                        Console.WriteLine($"- Поле {state.Key}: {error.ErrorMessage}");
                         AddNotification("Ошибка валидации", 
                             $"Поле {state.Key}: {error.ErrorMessage}", 
                             NotificationService.NotificationType.Error);
@@ -104,13 +109,18 @@ namespace Airport.Controllers
                     return View(departure);
                 }
 
+                Console.WriteLine($"Создание нового вылета: Местоположение={departure.Location}, Время={departure.Time}, FlightId={departure.FlightId}");
                 _context.Add(departure);
                 await _context.SaveChangesAsync();
+                Console.WriteLine("Вылет успешно сохранен в базе данных");
                 AddNotification("Успешно", "Вылет успешно создан", NotificationService.NotificationType.Success);
-                return RedirectToAction(nameof(Index), new { flightId = departure.FlightId });
+                
+                // Возвращаем на страницу всех вылетов без фильтрации
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Ошибка при создании вылета: {ex.Message}");
                 AddNotification("Ошибка", $"Не удалось сохранить: {ex.Message}", NotificationService.NotificationType.Error);
                 ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
                 return View(departure);
@@ -141,17 +151,23 @@ namespace Airport.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Location,Time,FlightId")] Departure departure)
         {
+            Console.WriteLine($"=== НАЧАЛО РЕДАКТИРОВАНИЯ ВЫЛЕТА ===");
+            Console.WriteLine($"Получены данные: ID={departure.Id}, Местоположение={departure.Location}, Время={departure.Time}, FlightId={departure.FlightId}");
+            
             if (id != departure.Id)
             {
+                Console.WriteLine($"Ошибка: ID в URL ({id}) не соответствует ID в модели ({departure.Id})");
                 return NotFound();
             }
 
             if (!ModelState.IsValid)
             {
+                Console.WriteLine("Ошибки валидации модели:");
                 foreach (var state in ModelState)
                 {
                     foreach (var error in state.Value.Errors)
                     {
+                        Console.WriteLine($"- Поле {state.Key}: {error.ErrorMessage}");
                         AddNotification("Ошибка валидации", 
                             $"Поле {state.Key}: {error.ErrorMessage}", 
                             NotificationService.NotificationType.Error);
@@ -167,29 +183,37 @@ namespace Airport.Controllers
                 var flight = await _context.Flights.FindAsync(departure.FlightId);
                 if (flight != null && departure.Time <= flight.DepartureTime)
                 {
+                    Console.WriteLine("Ошибка: время вылета должно быть позже времени вылета рейса");
                     AddNotification("Ошибка", "Время вылета должно быть позже времени вылета рейса", NotificationService.NotificationType.Error);
                     ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
                     return View(departure);
                 }
 
+                Console.WriteLine($"Обновление вылета ID={departure.Id}: Местоположение={departure.Location}, Время={departure.Time}, FlightId={departure.FlightId}");
                 _context.Update(departure);
                 await _context.SaveChangesAsync();
+                Console.WriteLine("Вылет успешно обновлен в базе данных");
                 AddNotification("Успешно", "Вылет успешно обновлен", NotificationService.NotificationType.Success);
-                return RedirectToAction(nameof(Index), new { flightId = departure.FlightId });
+                
+                // Возвращаем на страницу всех вылетов без фильтрации
+                return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 if (!DepartureExists(departure.Id))
                 {
+                    Console.WriteLine($"Ошибка конкурентного обновления: вылет ID={departure.Id} не найден");
                     return NotFound();
                 }
                 else
                 {
+                    Console.WriteLine($"Ошибка конкурентного обновления: {ex.Message}");
                     throw;
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Ошибка при обновлении вылета: {ex.Message}");
                 AddNotification("Ошибка", $"Не удалось сохранить: {ex.Message}", NotificationService.NotificationType.Error);
                 ViewBag.FlightId = new SelectList(await _context.Flights.ToListAsync(), "Id", "FlightNumber", departure.FlightId);
                 return View(departure);
@@ -199,8 +223,12 @@ namespace Airport.Controllers
         // GET: Departure/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            Console.WriteLine($"=== ЗАПРОС НА УДАЛЕНИЕ ВЫЛЕТА ===");
+            Console.WriteLine($"Запрошенный ID: {id}");
+            
             if (id == null)
             {
+                Console.WriteLine("Ошибка: ID не указан");
                 return NotFound();
             }
 
@@ -209,20 +237,22 @@ namespace Airport.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (departure == null)
             {
+                Console.WriteLine($"Ошибка: вылет с ID={id} не найден");
                 return NotFound();
             }
+
+            Console.WriteLine($"Найден вылет ID={departure.Id}, Местоположение={departure.Location}, Время={departure.Time}, FlightId={departure.FlightId}");
 
             // Если запрос был отправлен с использованием POST, удаляем объект
             if (Request.Method == "POST")
             {
+                Console.WriteLine($"Удаление вылета ID={departure.Id}");
                 _context.Departures.Remove(departure);
                 await _context.SaveChangesAsync();
+                Console.WriteLine("Вылет успешно удален из базы данных");
                 AddNotification("Успешно", "Вылет успешно удален", NotificationService.NotificationType.Success);
                 
-                if (Request.Query.ContainsKey("flightId"))
-                {
-                    return RedirectToAction(nameof(Index), new { flightId = Request.Query["flightId"] });
-                }
+                // Возвращаем на страницу всех вылетов без фильтрации
                 return RedirectToAction(nameof(Index));
             }
 

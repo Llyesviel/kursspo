@@ -29,14 +29,14 @@ namespace Airport.Models
         public decimal Price { get; set; }
 
         // Внешний ключ
-        [Required(ErrorMessage = "Выберите самолет из списка")]
-        [Range(1, int.MaxValue, ErrorMessage = "Выберите самолет из списка")]
+        [Required(ErrorMessage = "Выберите самолет")]
+        [Range(1, int.MaxValue, ErrorMessage = "Необходимо выбрать самолет")]
         [Display(Name = "Самолет")]
         public int AircraftId { get; set; }
         
         // Добавляем статус рейса
         [Display(Name = "Статус")]
-        public string? Status { get; set; }
+        public string? Status { get; set; } = "Активен";  // Значение по умолчанию
         
         // Навигационные свойства
         [ForeignKey("AircraftId")]

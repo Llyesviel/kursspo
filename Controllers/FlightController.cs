@@ -120,10 +120,17 @@ namespace Airport.Controllers
                 var aircrafts = await _context.Aircrafts.ToListAsync();
                 ViewBag.AircraftId = new SelectList(aircrafts, "Id", "Name", flight.AircraftId);
                 
-                // Явная проверка AircraftId - если ID > 0, значит самолет был выбран
+                // Если ModelState содержит ошибку для Aircraft (навигационное свойство),
+                // удаляем эту ошибку, так как мы работаем с AircraftId
+                if (ModelState.ContainsKey("Aircraft"))
+                {
+                    ModelState.Remove("Aircraft");
+                }
+                
+                // Проверяем валидность AircraftId вручную, чтобы быть уверенными
                 if (flight.AircraftId <= 0)
                 {
-                    ModelState.AddModelError("AircraftId", "Выберите самолет из списка");
+                    ModelState.AddModelError("AircraftId", "Выберите самолет");
                     return View(flight);
                 }
                 
@@ -133,13 +140,6 @@ namespace Airport.Controllers
                 {
                     ModelState.AddModelError("AircraftId", $"Самолет с ID={flight.AircraftId} не найден в базе данных");
                     return View(flight);
-                }
-
-                // Если валидация самолета прошла успешно, но ModelState содержит ошибку для Aircraft,
-                // удаляем эту ошибку, так как она может быть связана с навигационным свойством
-                if (ModelState.ContainsKey("Aircraft"))
-                {
-                    ModelState.Remove("Aircraft");
                 }
                 
                 // Проверяем другие обязательные поля
@@ -199,24 +199,9 @@ namespace Airport.Controllers
                 flight.Tickets = null;
                 flight.Departures = null;
                 
-                // Проверяем состояние контекста перед сохранением
-                Console.WriteLine("Состояние контекста перед добавлением:");
-                foreach (var entry in _context.ChangeTracker.Entries())
-                {
-                    Console.WriteLine($"- Сущность: {entry.Entity.GetType().Name}, Состояние: {entry.State}");
-                }
-                
                 Console.WriteLine($"Добавление рейса: {flight.FlightNumber}, Самолет: {flight.AircraftId}, Дата вылета: {flight.DepartureTime}");
                 
                 _context.Add(flight);
-                
-                // Проверяем состояние контекста после добавления, но перед сохранением
-                Console.WriteLine("Состояние контекста после добавления:");
-                foreach (var entry in _context.ChangeTracker.Entries())
-                {
-                    Console.WriteLine($"- Сущность: {entry.Entity.GetType().Name}, Состояние: {entry.State}");
-                }
-                
                 var result = await _context.SaveChangesAsync();
                 
                 Console.WriteLine($"Результат сохранения: {result} записей изменено");
@@ -229,9 +214,6 @@ namespace Airport.Controllers
                     Console.WriteLine($"Рейс успешно сохранен в базе данных. ID: {savedFlight.Id}, Номер: {savedFlight.FlightNumber}, Статус: {savedFlight.Status}");
                     string statusMessage = !string.IsNullOrEmpty(savedFlight.Status) ? $" со статусом \"{savedFlight.Status}\"" : "";
                     
-                    // Принудительно обновляем контекст, чтобы быть уверенными, что изменения сохранены
-                    _context.Entry(savedFlight).State = EntityState.Detached;
-                    
                     AddNotification("Успешно", $"Рейс {savedFlight.FlightNumber}{statusMessage} успешно добавлен", NotificationService.NotificationType.Success);
                 }
                 else
@@ -239,9 +221,6 @@ namespace Airport.Controllers
                     Console.WriteLine($"Рейс не найден в базе данных после сохранения!");
                     AddNotification("Успешно", "Рейс успешно добавлен", NotificationService.NotificationType.Success);
                 }
-                
-                // Сохраняем уведомления между запросами
-                TempData.Keep("Notifications");
                 
                 Console.WriteLine("=== КОНЕЦ СОЗДАНИЯ РЕЙСА ===\n");
                 return RedirectToAction(nameof(Index));
@@ -308,10 +287,17 @@ namespace Airport.Controllers
                     return NotFound();
                 }
 
-                // Явная проверка AircraftId - если ID > 0, значит самолет был выбран
+                // Если ModelState содержит ошибку для Aircraft (навигационное свойство),
+                // удаляем эту ошибку, так как мы работаем с AircraftId
+                if (ModelState.ContainsKey("Aircraft"))
+                {
+                    ModelState.Remove("Aircraft");
+                }
+
+                // Проверяем валидность AircraftId вручную, чтобы быть уверенными
                 if (flight.AircraftId <= 0)
                 {
-                    ModelState.AddModelError("AircraftId", "Выберите самолет из списка");
+                    ModelState.AddModelError("AircraftId", "Выберите самолет");
                     return View(flight);
                 }
                 
@@ -321,13 +307,6 @@ namespace Airport.Controllers
                 {
                     ModelState.AddModelError("AircraftId", $"Самолет с ID={flight.AircraftId} не найден в базе данных");
                     return View(flight);
-                }
-
-                // Если валидация самолета прошла успешно, но ModelState содержит ошибку для Aircraft,
-                // удаляем эту ошибку, так как она может быть связана с навигационным свойством
-                if (ModelState.ContainsKey("Aircraft"))
-                {
-                    ModelState.Remove("Aircraft");
                 }
                 
                 // Проверяем другие обязательные поля
@@ -395,25 +374,10 @@ namespace Airport.Controllers
                 
                 try
                 {
-                    // Проверяем состояние контекста перед обновлением
-                    Console.WriteLine("Состояние контекста перед обновлением:");
-                    foreach (var entry in _context.ChangeTracker.Entries())
-                    {
-                        Console.WriteLine($"- Сущность: {entry.Entity.GetType().Name}, Состояние: {entry.State}");
-                    }
-                    
                     // Логируем детали рейса перед обновлением
                     Console.WriteLine($"Обновление рейса ID: {flight.Id}, Номер: {flight.FlightNumber}, Самолет: {(aircraft?.Name ?? "неизвестно")}, Дата вылета: {flight.DepartureTime}");
                     
                     _context.Update(flight);
-                    
-                    // Проверяем состояние контекста после обновления, но перед сохранением
-                    Console.WriteLine("Состояние контекста после обновления:");
-                    foreach (var entry in _context.ChangeTracker.Entries())
-                    {
-                        Console.WriteLine($"- Сущность: {entry.Entity.GetType().Name}, Состояние: {entry.State}");
-                    }
-                    
                     var result = await _context.SaveChangesAsync();
                     
                     Console.WriteLine($"Результат сохранения: {result} записей изменено");
@@ -428,9 +392,6 @@ namespace Airport.Controllers
                         Console.WriteLine($"Рейс успешно обновлен в базе данных: ID={updatedFlight.Id}, Номер={updatedFlight.FlightNumber}, Самолет={updatedFlight.AircraftId}, Статус={updatedFlight.Status}");
                         string statusMessage = !string.IsNullOrEmpty(updatedFlight.Status) ? $" со статусом \"{updatedFlight.Status}\"" : "";
                         
-                        // Принудительно обновляем контекст, чтобы быть уверенными, что изменения сохранены
-                        _context.Entry(updatedFlight).State = EntityState.Detached;
-                        
                         AddNotification("Успешно", $"Рейс {updatedFlight.FlightNumber}{statusMessage} успешно обновлен", NotificationService.NotificationType.Success);
                     }
                     else
@@ -438,9 +399,6 @@ namespace Airport.Controllers
                         Console.WriteLine($"Рейс не найден в базе данных после обновления!");
                         AddNotification("Успешно", "Рейс успешно обновлен", NotificationService.NotificationType.Success);
                     }
-                    
-                    // Сохраняем уведомления между запросами
-                    TempData.Keep("Notifications");
                     
                     Console.WriteLine("=== КОНЕЦ РЕДАКТИРОВАНИЯ РЕЙСА ===\n");
                     return RedirectToAction(nameof(Index));

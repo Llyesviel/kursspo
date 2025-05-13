@@ -22,12 +22,7 @@
             
             <div class="form-group mb-3">
                 <label asp-for="AircraftId" class="control-label fw-bold">Самолет *</label>
-                <select asp-for="AircraftId" asp-items="ViewBag.AircraftId" class="form-select" 
-                        required 
-                        data-val="true" 
-                        data-val-required="Выберите самолет из списка" 
-                        data-val-range="Выберите самолет из списка" 
-                        data-val-range-min="1">
+                <select asp-for="AircraftId" asp-items="ViewBag.AircraftId" class="form-select" required>
                     <option value="">-- Выберите самолет --</option>
                 </select>
                 <span asp-validation-for="AircraftId" class="text-danger"></span>
@@ -61,7 +56,6 @@
             <div class="form-group mb-4">
                 <label asp-for="Status" class="control-label">Статус рейса</label>
                 <select asp-for="Status" class="form-select">
-                    <option value="">-- Выберите статус --</option>
                     <option value="Активен">Активен</option>
                     <option value="Задержан">Задержан</option>
                     <option value="Отменен">Отменен</option>
@@ -115,67 +109,10 @@
             $('#AircraftId').addClass('border-primary');
             $('input[required], select[required]').addClass('border-primary');
             
-            // Явно задаем правила валидации для AircraftId
-            $.validator.addMethod("validAircraftId", function(value, element) {
-                return value && parseInt(value) > 0;
-            }, "Выберите самолет из списка");
-            
-            // Добавляем метод валидации в стандартную валидацию формы
-            $("#editFlightForm").validate({
-                rules: {
-                    AircraftId: {
-                        required: true,
-                        validAircraftId: true
-                    }
-                },
-                messages: {
-                    AircraftId: {
-                        required: "Выберите самолет из списка",
-                        validAircraftId: "Выберите самолет из списка"
-                    }
-                },
-                errorElement: "span",
-                errorClass: "text-danger",
-                highlight: function(element, errorClass, validClass) {
-                    $(element).addClass("is-invalid").removeClass("is-valid");
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass("is-invalid").addClass("is-valid");
-                }
-            });
-            
             // Автоматическая валидация при загрузке страницы
             if ($('#AircraftId').val()) {
                 $('#AircraftId').addClass('is-valid');
             }
-            
-            // Проверка формы перед отправкой
-            $('form').on('submit', function(e) {
-                var aircraftId = $('#AircraftId').val();
-                
-                if (!aircraftId) {
-                    e.preventDefault();
-                    $('#AircraftId').addClass('is-invalid');
-                    
-                    // Показываем сообщение об ошибке рядом с полем
-                    if (!$('#AircraftId').next('.text-danger').length) {
-                        $('#AircraftId').after('<span class="text-danger">Выберите самолет из списка</span>');
-                    }
-                    
-                    return false;
-                }
-                
-                // Показываем индикатор загрузки
-                $('#submitForm').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Сохранение...');
-                
-                // Убираем класс ошибки и отправляем форму
-                $('#AircraftId').removeClass('is-invalid').addClass('is-valid');
-                $('#AircraftId').next('.text-danger').remove();
-                
-                console.log('Форма редактирования отправляется на сервер...');
-                console.log('AircraftId: ' + aircraftId);
-                return true;
-            });
             
             // Проверка при изменении значения самолета
             $('#AircraftId').change(function() {
@@ -183,18 +120,22 @@
                 
                 if (aircraftId && parseInt(aircraftId) > 0) {
                     $(this).removeClass('is-invalid').addClass('is-valid');
-                    $(this).next('.text-danger').remove();
                     console.log('Выбран самолет с ID: ' + aircraftId);
                 } else {
                     $(this).removeClass('is-valid').addClass('is-invalid');
-                    
-                    // Показываем сообщение об ошибке рядом с полем
-                    if (!$(this).next('.text-danger').length) {
-                        $(this).after('<span class="text-danger">Выберите самолет из списка</span>');
-                    }
-                    
                     console.log('Самолет не выбран');
                 }
+            });
+            
+            // Отладка - логируем данные формы перед отправкой
+            $('#editFlightForm').on('submit', function() {
+                console.log('Форма редактирования отправляется на сервер...');
+                console.log('AircraftId: ' + $('#AircraftId').val());
+                
+                // Показываем индикатор загрузки
+                $('#submitForm').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Сохранение...');
+                
+                return true;
             });
         });
     </script>
