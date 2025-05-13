@@ -9,42 +9,193 @@
 <hr />
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Edit">
-            <div asp-validation-summary="All" class="text-danger"></div>
+        <form asp-action="Edit" method="post" id="editFlightForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            
             <div class="form-group mb-3">
                 <label asp-for="FlightNumber" class="control-label">№ рейса</label>
-                <input asp-for="FlightNumber" class="form-control" />
+                <input asp-for="FlightNumber" class="form-control" placeholder="Например, SU123" required />
                 <span asp-validation-for="FlightNumber" class="text-danger"></span>
+                <small class="form-text text-muted">Введите уникальный номер рейса</small>
             </div>
-            <div class="form-group">
-                <label asp-for="AircraftId" class="control-label">Самолет</label>
-                <select asp-for="AircraftId" class="form-control" asp-items="ViewBag.AircraftId"></select>
+            
+            <div class="form-group mb-3">
+                <label asp-for="AircraftId" class="control-label fw-bold">Самолет *</label>
+                <select asp-for="AircraftId" asp-items="ViewBag.AircraftId" class="form-select" 
+                        required 
+                        data-val="true" 
+                        data-val-required="Выберите самолет из списка" 
+                        data-val-range="Выберите самолет из списка" 
+                        data-val-range-min="1">
+                    <option value="">-- Выберите самолет --</option>
+                </select>
                 <span asp-validation-for="AircraftId" class="text-danger"></span>
+                <small class="form-text text-muted">Обязательное поле. Выберите самолет для рейса</small>
             </div>
-            <div class="form-group">
+            
+            <div class="form-group mb-3">
+                <label asp-for="DepartureTime" class="control-label">Время вылета</label>
+                <input asp-for="DepartureTime" class="form-control" type="datetime-local" step="60" required />
+                <span asp-validation-for="DepartureTime" class="text-danger"></span>
+                <small class="form-text text-muted">Укажите дату и время вылета</small>
+            </div>
+            
+            <div class="form-group mb-3">
                 <label asp-for="AvailableSeats" class="control-label">Доступные места</label>
                 <input asp-for="AvailableSeats" class="form-control" />
                 <span asp-validation-for="AvailableSeats" class="text-danger"></span>
+                <small class="form-text text-muted">Количество доступных мест не может быть меньше, чем уже забронировано</small>
             </div>
-            <div class="form-group mb-3">
-                <label asp-for="DepartureTime" class="control-label">Время вылета</label>
-                <input asp-for="DepartureTime" class="form-control" type="datetime-local" step="60" />
-                <span asp-validation-for="DepartureTime" class="text-danger"></span>
-            </div>
+            
             <div class="form-group mb-3">
                 <label asp-for="Price" class="control-label">Цена</label>
-                <input asp-for="Price" class="form-control" />
+                <div class="input-group">
+                    <input asp-for="Price" class="form-control" placeholder="0.00" required />
+                    <span class="input-group-text">₽</span>
+                </div>
                 <span asp-validation-for="Price" class="text-danger"></span>
+                <small class="form-text text-muted">Укажите стоимость билета</small>
             </div>
+            
+            <div class="form-group mb-4">
+                <label asp-for="Status" class="control-label">Статус рейса</label>
+                <select asp-for="Status" class="form-select">
+                    <option value="">-- Выберите статус --</option>
+                    <option value="Активен">Активен</option>
+                    <option value="Задержан">Задержан</option>
+                    <option value="Отменен">Отменен</option>
+                    <option value="Выполнен">Выполнен</option>
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+                <small class="form-text text-muted">Укажите текущий статус рейса</small>
+            </div>
+            
             <div class="form-group">
-                <input type="submit" value="Сохранить" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
+                <button type="submit" id="submitForm" name="submitForm" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Сохранить изменения
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Назад к списку
+                </a>
             </div>
         </form>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-info-circle me-2"></i>Информация о редактировании рейса
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>Самолет:</strong> Выбор самолета обязателен! Убедитесь, что вы выбрали самолет из списка.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Доступные места:</strong> Количество доступных мест не может быть меньше числа уже забронированных билетов.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Статус рейса:</strong> Изменение статуса рейса повлияет на отображение информации для пассажиров.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Внимание:</strong> При изменении параметров рейса информация об этом будет доступна пассажирам.
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Подсветка обязательных полей
+            $('#AircraftId').addClass('border-primary');
+            $('input[required], select[required]').addClass('border-primary');
+            
+            // Явно задаем правила валидации для AircraftId
+            $.validator.addMethod("validAircraftId", function(value, element) {
+                return value && parseInt(value) > 0;
+            }, "Выберите самолет из списка");
+            
+            // Добавляем метод валидации в стандартную валидацию формы
+            $("#editFlightForm").validate({
+                rules: {
+                    AircraftId: {
+                        required: true,
+                        validAircraftId: true
+                    }
+                },
+                messages: {
+                    AircraftId: {
+                        required: "Выберите самолет из списка",
+                        validAircraftId: "Выберите самолет из списка"
+                    }
+                },
+                errorElement: "span",
+                errorClass: "text-danger",
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass("is-invalid").removeClass("is-valid");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass("is-invalid").addClass("is-valid");
+                }
+            });
+            
+            // Автоматическая валидация при загрузке страницы
+            if ($('#AircraftId').val()) {
+                $('#AircraftId').addClass('is-valid');
+            }
+            
+            // Проверка формы перед отправкой
+            $('form').on('submit', function(e) {
+                var aircraftId = $('#AircraftId').val();
+                
+                if (!aircraftId) {
+                    e.preventDefault();
+                    $('#AircraftId').addClass('is-invalid');
+                    
+                    // Показываем сообщение об ошибке рядом с полем
+                    if (!$('#AircraftId').next('.text-danger').length) {
+                        $('#AircraftId').after('<span class="text-danger">Выберите самолет из списка</span>');
+                    }
+                    
+                    return false;
+                }
+                
+                // Показываем индикатор загрузки
+                $('#submitForm').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Сохранение...');
+                
+                // Убираем класс ошибки и отправляем форму
+                $('#AircraftId').removeClass('is-invalid').addClass('is-valid');
+                $('#AircraftId').next('.text-danger').remove();
+                
+                console.log('Форма редактирования отправляется на сервер...');
+                console.log('AircraftId: ' + aircraftId);
+                return true;
+            });
+            
+            // Проверка при изменении значения самолета
+            $('#AircraftId').change(function() {
+                var aircraftId = $(this).val();
+                
+                if (aircraftId && parseInt(aircraftId) > 0) {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                    $(this).next('.text-danger').remove();
+                    console.log('Выбран самолет с ID: ' + aircraftId);
+                } else {
+                    $(this).removeClass('is-valid').addClass('is-invalid');
+                    
+                    // Показываем сообщение об ошибке рядом с полем
+                    if (!$(this).next('.text-danger').length) {
+                        $(this).after('<span class="text-danger">Выберите самолет из списка</span>');
+                    }
+                    
+                    console.log('Самолет не выбран');
+                }
+            });
+        });
+    </script>
 } 

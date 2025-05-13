@@ -40,7 +40,26 @@
         modal.show();
         
         confirmBtn.onclick = function() {
-            window.location.href = this.getAttribute('data-url');
+            // Вместо перехода на страницу подтверждения, отправляем POST-запрос
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = this.getAttribute('data-url');
+            
+            // Добавляем CSRF токен для защиты от CSRF атак
+            var antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (antiForgeryToken) {
+                var tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = '__RequestVerificationToken';
+                tokenInput.value = antiForgeryToken.value;
+                form.appendChild(tokenInput);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+            
+            // Скрываем модальное окно
+            modal.hide();
         };
     }
     

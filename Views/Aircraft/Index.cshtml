@@ -39,7 +39,7 @@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Изменить</a>
                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a>
-                <a href="javascript:void(0);" onclick="showDeleteConfirmation('@Url.Action("Delete", "Aircraft", new { id = item.Id })')" class="btn btn-sm btn-danger">Удалить</a>
+                <a href="javascript:void(0);" onclick="showDeleteConfirmation('@Url.Action("Delete", "Aircraft", new { id = item.Id })', 'самолет &quot;@item.Name&quot;')" class="btn btn-sm btn-danger">Удалить</a>
             </td>
         </tr>
 }

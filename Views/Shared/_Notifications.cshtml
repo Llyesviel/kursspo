@@ -11,7 +11,7 @@
             
             if (notifications != null && notifications.Any())
             {
-                <div class="notifications-container">
+                <div id="notifications-container" class="notifications-container">
                     @foreach (var notification in notifications)
                     {
                         <div class="alert alert-@notification.GetCssClass() alert-dismissible fade show notification-item" role="alert">
@@ -31,6 +31,22 @@
                         </div>
                     }
                 </div>
+                
+                <script>
+                    // Автоматически скрываем уведомления через 5 секунд
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const alerts = document.querySelectorAll('.notification-item');
+                        alerts.forEach(function(alert) {
+                            setTimeout(function() {
+                                var bsAlert = new bootstrap.Alert(alert);
+                                bsAlert.close();
+                            }, 5000);
+                        });
+                        
+                        // Отладка - выводим информацию о найденных уведомлениях
+                        console.log('Найдено уведомлений: ' + alerts.length);
+                    });
+                </script>
             }
         }
     }
@@ -49,6 +65,13 @@
         margin-bottom: 10px;
         box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         border: none;
+        opacity: 0.95;
+        transition: all 0.3s ease;
+    }
+    
+    .notification-item:hover {
+        opacity: 1;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
     
     .notification-icon {

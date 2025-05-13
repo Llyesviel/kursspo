@@ -6,54 +6,103 @@
 
 <h1>Рейсы</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Добавить рейс</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                № рейса
-            </th>
-            <th>
-                Самолет
-            </th>
-            <th>
-                Время вылета
-            </th>
-            <th>
-                Свободные места
-            </th>
-            <th>
-                Цена
-            </th>
-            <th>Действия</th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FlightNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Aircraft.Name)
-            </td>
-            <td>
-                @item.DepartureTime.ToString("dd.MM.yyyy HH:mm")
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AvailableSeats)/@item.Aircraft.SeatCount
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Изменить</a>
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a>
-                <a href="javascript:void(0);" onclick="showDeleteConfirmation('@Url.Action("Delete", "Flight", new { id = item.Id })')" class="btn btn-sm btn-danger">Удалить</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table> 
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-search me-2"></i>Поиск рейсов
+            </div>
+            <div class="card-body">
+                <form asp-action="Index" method="get" class="row g-3">
+                    <div class="col-md-8">
+                        <label for="searchString" class="form-label">Номер рейса</label>
+                        <input type="text" class="form-control" id="searchString" name="searchString" 
+                               value="@ViewBag.CurrentSearchString" placeholder="Например, SU123">
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Найти
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-redo me-2"></i>Сбросить фильтры
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-start mb-4">
+    <a asp-action="Create" class="btn btn-info">
+        <i class="fas fa-plus me-2"></i>Добавить рейс
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>№ рейса</th>
+                <th>Самолет</th>
+                <th>Время вылета</th>
+                <th>Свободные места</th>
+                <th>Цена</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.FlightNumber)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Aircraft.Name)</td>
+                        <td>@item.DepartureTime.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@Html.DisplayFor(modelItem => item.AvailableSeats)/@item.Aircraft.SeatCount</td>
+                        <td>@Html.DisplayFor(modelItem => item.Price) ₽</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.Status))
+                            {
+                                <span class="badge @(item.Status == "Отменен" ? "bg-danger" : 
+                                               item.Status == "Задержан" ? "bg-warning" : 
+                                               item.Status == "Выполнен" ? "bg-success" : "bg-info")">
+                                    @item.Status
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Не указан</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit me-1"></i>Изменить
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">
+                                    <i class="fas fa-info-circle me-1"></i>Детали
+                                </a>
+                                <a href="javascript:void(0);" onclick="showDeleteConfirmation('@Url.Action("Delete", "Flight", new { id = item.Id })', 'рейс &quot;@item.FlightNumber&quot;')" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash me-1"></i>Удалить
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center py-3">
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Рейсы не найдены. Попробуйте изменить параметры поиска или добавьте новый рейс.
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div> 
