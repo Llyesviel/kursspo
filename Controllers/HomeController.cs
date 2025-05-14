@@ -88,35 +88,17 @@ namespace Airport.Controllers
             return RedirectToAction("MyTickets", "Booking");
         }
 
-        // Отчет о проданных билетах за период
-        public async Task<IActionResult> TicketSalesReport(DateTime? startDate, DateTime? endDate)
+        // Отчет о проданных билетах
+        public async Task<IActionResult> TicketSalesReport()
         {
-            if (!startDate.HasValue)
-            {
-                startDate = DateTime.Today.AddMonths(-1);
-            }
-
-            if (!endDate.HasValue)
-            {
-                endDate = DateTime.Today;
-            }
-
-            if (endDate < startDate)
-            {
-                endDate = startDate.Value.AddMonths(1);
-            }
-
             var tickets = await _context.Tickets
                 .Include(t => t.Flight)
                 .Include(t => t.Flight.Aircraft)
                 .Include(t => t.Flight.Landings)
-                .Where(t => t.Date >= startDate && t.Date <= endDate)
                 .OrderBy(t => t.Date)
                 .ThenBy(t => t.Time)
                 .ToListAsync();
 
-            ViewBag.StartDate = startDate.Value.ToString("yyyy-MM-dd");
-            ViewBag.EndDate = endDate.Value.ToString("yyyy-MM-dd");
             ViewBag.TotalSales = tickets.Sum(t => t.Flight.Price);
             ViewBag.TicketCount = tickets.Count;
             

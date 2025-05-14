@@ -18,26 +18,6 @@
 <div class="container-fluid">
     <h1 class="mt-4 mb-4">@ViewData["Title"]</h1>
 
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <form method="get" class="form-inline d-flex align-items-center">
-                        <div class="form-group me-3">
-                            <label for="startDate" class="me-2">Начальная дата:</label>
-                            <input type="date" id="startDate" name="startDate" class="form-control" value="@ViewBag.StartDate">
-                        </div>
-                        <div class="form-group me-3">
-                            <label for="endDate" class="me-2">Конечная дата:</label>
-                            <input type="date" id="endDate" name="endDate" class="form-control" value="@ViewBag.EndDate">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Показать</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Общая статистика -->
     <div class="row mb-4">
         <div class="col-md-4">
@@ -77,19 +57,29 @@
                         </div>
                     </div>
                     <div class="mt-3">
-                        <div class="progress" style="height: 25px;">
+                        <div class="progress" style="height: 25px; width: 100%;">
                             @if (ViewBag.TicketCount > 0)
                             {
-                                var onlinePercent = (double)onlineTickets.Count() / ViewBag.TicketCount * 100;
-                                var offlinePercent = (double)offlineTickets.Count() / ViewBag.TicketCount * 100;
+                                double onlinePercentDouble = (double)onlineTickets.Count() / ViewBag.TicketCount * 100;
+                                double offlinePercentDouble = (double)offlineTickets.Count() / ViewBag.TicketCount * 100;
                                 
-                                <div class="progress-bar bg-info" role="progressbar" style="width: @onlinePercent%;" 
-                                    aria-valuenow="@onlinePercent" aria-valuemin="0" aria-valuemax="100">
-                                    Онлайн (@onlinePercent.ToString("0.0")%)
+                                // Принудительно делаем сумму ровно 100%
+                                double sumPercents = onlinePercentDouble + offlinePercentDouble;
+                                onlinePercentDouble = Math.Round(onlinePercentDouble / sumPercents * 100, 1);
+                                offlinePercentDouble = 100 - onlinePercentDouble;
+                                
+                                string onlinePercent = onlinePercentDouble.ToString("0.0").Replace(",", ".");
+                                string offlinePercent = offlinePercentDouble.ToString("0.0").Replace(",", ".");
+                                
+                                <div class="progress-bar bg-info" role="progressbar" 
+                                     style="width: @onlinePercent%; display: inline-block; margin: 0; padding: 0;" 
+                                     aria-valuenow="@onlinePercentDouble" aria-valuemin="0" aria-valuemax="100">
+                                    Онлайн (@onlinePercentDouble.ToString("0.0")%)
                                 </div>
-                                <div class="progress-bar bg-success" role="progressbar" style="width: @offlinePercent%;" 
-                                    aria-valuenow="@offlinePercent" aria-valuemin="0" aria-valuemax="100">
-                                    Офлайн (@offlinePercent.ToString("0.0")%)
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: @offlinePercent%; display: inline-block; margin: 0; padding: 0;" 
+                                     aria-valuenow="@offlinePercentDouble" aria-valuemin="0" aria-valuemax="100">
+                                    Офлайн (@offlinePercentDouble.ToString("0.0")%)
                                 </div>
                             }
                         </div>
@@ -128,7 +118,7 @@
                                     var totalRevenue = flightGroup.Sum(t => t.Flight.Price);
                                     var onlineCount = flightGroup.Count(t => t.PurchaseSource == "Online");
                                     var offlineCount = flightGroup.Count(t => t.PurchaseSource == "Offline");
-                                    var landings = string.Join(" → ", firstTicket.Flight.Landings?.Select(l => l.Location) ?? new[] { "Н/Д" });
+                                    var landings = string.Join(" → ", firstTicket.Flight.Landings?.Select(l => l?.Location) ?? new[] { "Н/Д" });
                                     
                                     <tr>
                                         <td><strong>@firstTicket.Flight.FlightNumber</strong></td>
@@ -200,13 +190,4 @@
             </div>
         </div>
     </div>
-</div>
-
-@section Scripts {
-    <script>
-        // Устанавливаем минимальную дату для конечной даты равной начальной
-        document.getElementById('startDate').addEventListener('change', function() {
-            document.getElementById('endDate').min = this.value;
-        });
-    </script>
-} 
+</div> 

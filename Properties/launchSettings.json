@@ -13,10 +13,9 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:5254",
+      "applicationUrl": "http://localhost:5255",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.Watch.BrowserRefresh"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "hotReloadEnabled": true,
       "hotReloadProfile": "aspnetcore"
@@ -25,10 +24,9 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7049;http://localhost:5254",
+      "applicationUrl": "https://localhost:7050;http://localhost:5255",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.Watch.BrowserRefresh"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "hotReloadEnabled": true,
       "hotReloadProfile": "aspnetcore"
