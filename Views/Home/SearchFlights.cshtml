@@ -216,7 +216,7 @@
                 
                 if (!isCheapest && !isBestAvailability) // Не показываем дублирующиеся рейсы
                 {
-                    <div class="card flight-card mb-3" data-price="@flight.Price" data-time="@flight.DepartureTime.Ticks" data-seats="@flight.AvailableSeats">
+                    <div class="card flight-card mb-3" data-price="@flight.Price.ToString("0.##")" data-time="@flight.DepartureTime.Ticks" data-seats="@flight.AvailableSeats">
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col-md-4">
@@ -252,6 +252,26 @@
 </div>
 
 @section Scripts {
+    <style>
+        .highlight-sort {
+            transition: background-color 0.5s ease;
+            animation: highlightSort 1s ease;
+        }
+        
+        @@keyframes highlightSort {
+            0% { background-color: rgba(13, 110, 253, 0.1); }
+            100% { background-color: transparent; }
+        }
+        
+        #sort-price, #sort-time, #sort-seats {
+            transition: all 0.3s ease;
+        }
+        
+        #sort-price.active, #sort-time.active, #sort-seats.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+    </style>
     <script>
         $(document).ready(function() {
             // Сортировка по цене (по умолчанию)
@@ -276,8 +296,8 @@
                 var flights = $("#flight-results .flight-card").get();
                 
                 flights.sort(function(a, b) {
-                    var valueA = $(a).data(sortBy);
-                    var valueB = $(b).data(sortBy);
+                    var valueA = parseFloat($(a).data(sortBy));
+                    var valueB = parseFloat($(b).data(sortBy));
                     
                     if (sortBy === 'price' || sortBy === 'time') {
                         return valueA - valueB; // По возрастанию
@@ -286,9 +306,19 @@
                     }
                 });
                 
+                // Очищаем контейнер перед добавлением отсортированных элементов
+                $("#flight-results").empty();
+                
+                // Добавляем отсортированные элементы
                 $.each(flights, function(index, flight) {
                     $("#flight-results").append(flight);
                 });
+                
+                // Добавляем анимацию для выделения изменений
+                $("#flight-results .flight-card").addClass('highlight-sort');
+                setTimeout(function() {
+                    $("#flight-results .flight-card").removeClass('highlight-sort');
+                }, 1000);
             }
             
             // Функция для обмена городами
@@ -330,6 +360,9 @@
                     $('.invalid-feedback').remove();
                 }
             });
+            
+            // Автоматически сортируем по цене при загрузке страницы
+            sortFlights('price');
         });
     </script>
 } 
