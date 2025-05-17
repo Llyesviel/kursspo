@@ -4,6 +4,7 @@ using Airport.Models;
 using Airport.Data;
 using Airport.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using BCrypt.Net;
 
 namespace Airport.Services
 {
@@ -176,11 +177,7 @@ namespace Airport.Services
                 throw new ArgumentException("Пароль не может быть пустым", nameof(password));
             }
 
-            using (var sha256 = SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
-            }
+            return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
         private bool VerifyPassword(string password, string hash)
@@ -195,7 +192,7 @@ namespace Airport.Services
                 return false;
             }
 
-            return HashPassword(password) == hash;
+            return BCrypt.Net.BCrypt.Verify(password, hash);
         }
     }
 } 

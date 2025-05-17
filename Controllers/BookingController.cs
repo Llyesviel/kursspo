@@ -40,26 +40,46 @@ namespace Airport.Controllers
 
         // AJAX: Форма бронирования
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> BookingForm(int flightId)
         {
             var flight = await _context.Flights
                 .Include(f => f.Aircraft)
+                .Include(f => f.Landings)
+                .Include(f => f.Departures)
                 .FirstOrDefaultAsync(f => f.Id == flightId);
 
             if (flight == null || flight.AvailableSeats <= 0)
             {
-                return BadRequest("Рейс не найден или нет свободных мест");
+                _notificationService.AddNotification("Ошибка", "Рейс не найден или нет свободных мест", NotificationService.NotificationType.Error);
+                return RedirectToAction("SearchFlights", "Home");
             }
+
+            // Получаем города отправления и прибытия
+            string departureCity = flight.Departures?.FirstOrDefault()?.Location ?? "Неизвестно";
+            string arrivalCity = flight.Landings?.FirstOrDefault()?.Location ?? "Неизвестно";
 
             var bookingViewModel = new BookingViewModel
             {
                 FlightId = flightId,
                 FlightNumber = flight.FlightNumber,
                 DepartureTime = flight.DepartureTime,
-                Price = flight.Price
+                Price = flight.Price,
+                DepartureCity = departureCity,
+                ArrivalCity = arrivalCity
             };
 
-            return PartialView("_BookingForm", bookingViewModel);
+            // Отображаем полное представление
+            return View(bookingViewModel);
+        }
+
+        // GET: Бронирование билета (перенаправление на форму)
+        [HttpGet]
+        [Authorize]
+        public IActionResult BookTicket(int flightId)
+        {
+            // Перенаправляем на метод BookingForm с тем же ID рейса
+            return RedirectToAction("BookingForm", new { flightId = flightId });
         }
 
         // POST: Бронирование билета

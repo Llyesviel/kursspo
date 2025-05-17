@@ -157,7 +157,7 @@
                             <h4 class="text-success fw-bold">@cheapestFlight.Price.ToString("C0")</h4>
                         </div>
                         <div class="col-md-2">
-                            <a asp-controller="Booking" asp-action="BookTicket" asp-route-flightId="@cheapestFlight.Id" class="btn btn-primary w-100">Выбрать</a>
+                            <a asp-controller="Booking" asp-action="BookingForm" asp-route-flightId="@cheapestFlight.Id" class="btn btn-primary w-100">Выбрать</a>
                         </div>
                     </div>
                 </div>
@@ -200,7 +200,7 @@
                             <h4 class="fw-bold">@bestAvailabilityFlight.Price.ToString("C0")</h4>
                         </div>
                         <div class="col-md-2">
-                            <a asp-controller="Booking" asp-action="BookTicket" asp-route-flightId="@bestAvailabilityFlight.Id" class="btn btn-primary w-100">Выбрать</a>
+                            <a asp-controller="Booking" asp-action="BookingForm" asp-route-flightId="@bestAvailabilityFlight.Id" class="btn btn-primary w-100">Выбрать</a>
                         </div>
                     </div>
                 </div>
@@ -240,7 +240,7 @@
                                     <h4 class="fw-bold">@flight.Price.ToString("C0")</h4>
                                 </div>
                                 <div class="col-md-2">
-                                    <a asp-controller="Booking" asp-action="BookTicket" asp-route-flightId="@flight.Id" class="btn btn-primary w-100">Выбрать</a>
+                                    <a asp-controller="Booking" asp-action="BookingForm" asp-route-flightId="@flight.Id" class="btn btn-primary w-100">Выбрать</a>
                                 </div>
                             </div>
                         </div>

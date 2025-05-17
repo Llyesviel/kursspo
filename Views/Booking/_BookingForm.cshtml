@@ -1,19 +1,15 @@
 @model Airport.Controllers.BookingViewModel
 
 <div class="booking-form">
-    <div class="text-center mb-4">
-        <div class="fw-bold fs-4">Бронирование билета</div>
-        <div class="text-muted">Рейс @Model.FlightNumber - @Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</div>
-        <div class="ticket-price mt-2">
-            <span class="fs-5 fw-bold text-primary">@Model.Price ₽</span>
-        </div>
-    </div>
+    <h5 class="mb-3">Информация о пассажире</h5>
     
     <form id="bookingForm" method="post" asp-controller="Booking" asp-action="BookTicket">
         <input type="hidden" asp-for="FlightId" />
         <input type="hidden" asp-for="FlightNumber" />
         <input type="hidden" asp-for="DepartureTime" />
         <input type="hidden" asp-for="Price" />
+        <input type="hidden" asp-for="DepartureCity" />
+        <input type="hidden" asp-for="ArrivalCity" />
         
         <div class="mb-3">
             <label asp-for="PassengerName" class="form-label">ФИО пассажира</label>
@@ -46,12 +42,15 @@
             </small>
         </div>
         
-        <div class="form-text mb-3">
-            Стоимость билета будет списана с вашего счета после подтверждения бронирования.
+        <div id="bookingError" class="alert alert-danger mb-3 d-none">
+            <small>
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span id="bookingErrorMessage">Ошибка при бронировании билета</span>
+            </small>
         </div>
         
         <div class="d-grid">
-            <button type="submit" class="btn btn-primary">
+            <button id="bookingBtn" type="submit" class="btn btn-primary">
                 <i class="fas fa-check-circle me-2"></i> Подтвердить бронирование
             </button>
         </div>

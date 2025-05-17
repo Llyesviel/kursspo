@@ -1,6 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using Airport.Models;
-using System.Security.Cryptography;
-using System.Text;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Airport.Data
 {
@@ -8,262 +10,331 @@ namespace Airport.Data
     {
         public static void Initialize(ApplicationDbContext context)
         {
-            // Проверяем, что база данных создана
+            // Проверяем, что база данных существует
             context.Database.EnsureCreated();
 
-            // Инициализация пользователей
-            if (!context.Users.Any())
+            // Если в базе есть данные, выходим
+            if (context.Users.Any())
             {
-                // Добавляем тестового пользователя
-                var user = new User
-                {
-                    Username = "admin",
-                    Email = "admin@airport.com",
-                    PasswordHash = HashPassword("admin123"),
-                    Role = "Admin"
-                };
-                
-                // Добавляем еще одного обычного пользователя
-                var regularUser = new User
-                {
-                    Username = "user",
-                    Email = "user@example.com",
-                    PasswordHash = HashPassword("user123"),
-                    Role = "User"
-                };
-                
-                context.Users.Add(user);
-                context.Users.Add(regularUser);
-                context.SaveChanges();
+                return;
             }
 
-            // Инициализация самолетов и других данных
-            if (!context.Aircrafts.Any())
+            Console.WriteLine("Начинаем инициализацию базы данных...");
+
+            // Добавляем пользователей
+            var users = new List<User>
             {
-                // Добавляем самолеты
-                var aircrafts = new Aircraft[]
-                {
-                    new Aircraft { Name = "Boeing 737-800", Category = "Пассажирский", SeatCount = 189 },
-                    new Aircraft { Name = "Airbus A320neo", Category = "Пассажирский", SeatCount = 180 },
-                    new Aircraft { Name = "Boeing 777-300ER", Category = "Пассажирский дальнемагистральный", SeatCount = 402 },
-                    new Aircraft { Name = "Sukhoi Superjet 100", Category = "Региональный", SeatCount = 98 },
-                    new Aircraft { Name = "Airbus A350-900", Category = "Пассажирский дальнемагистральный", SeatCount = 325 },
-                    new Aircraft { Name = "Boeing 787-9 Dreamliner", Category = "Пассажирский дальнемагистральный", SeatCount = 290 },
-                    new Aircraft { Name = "Airbus A330-300", Category = "Пассажирский дальнемагистральный", SeatCount = 293 },
-                    new Aircraft { Name = "Embraer E190", Category = "Региональный", SeatCount = 114 },
-                    new Aircraft { Name = "Boeing 747-8", Category = "Пассажирский дальнемагистральный", SeatCount = 467 },
-                    new Aircraft { Name = "MC-21-300", Category = "Пассажирский", SeatCount = 211 }
-                };
+                new User { 
+                    Username = "admin", 
+                    Email = "admin@example.com", 
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin"), 
+                    Role = "Admin", 
+                    CreatedAt = DateTime.Now 
+                },
+                new User { 
+                    Username = "user", 
+                    Email = "user@example.com", 
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("user"), 
+                    Role = "User", 
+                    CreatedAt = DateTime.Now 
+                },
+            };
+            
+            context.Users.AddRange(users);
+            context.SaveChanges();
+            Console.WriteLine("Пользователи добавлены.");
 
-                foreach (var aircraft in aircrafts)
-                {
-                    context.Aircrafts.Add(aircraft);
-                }
-                context.SaveChanges();
+            // Добавляем самолеты
+            var aircrafts = new List<Aircraft>
+            {
+                new Aircraft { Name = "Boeing 737", SeatCount = 180, Category = "Пассажирский" },
+                new Aircraft { Name = "Airbus A320", SeatCount = 150, Category = "Пассажирский" },
+                new Aircraft { Name = "Sukhoi Superjet 100", SeatCount = 100, Category = "Региональный" },
+                new Aircraft { Name = "Boeing 777", SeatCount = 300, Category = "Пассажирский дальнемагистральный" },
+                new Aircraft { Name = "Airbus A380", SeatCount = 500, Category = "Пассажирский дальнемагистральный" },
+                new Aircraft { Name = "Embraer E190", SeatCount = 114, Category = "Региональный" },
+                new Aircraft { Name = "Airbus A321", SeatCount = 200, Category = "Пассажирский" },
+                new Aircraft { Name = "Boeing 787", SeatCount = 250, Category = "Пассажирский дальнемагистральный" },
+                new Aircraft { Name = "ATR 72", SeatCount = 70, Category = "Региональный" },
+                new Aircraft { Name = "Boeing 747", SeatCount = 400, Category = "Пассажирский дальнемагистральный" }
+            };
+            
+            context.Aircrafts.AddRange(aircrafts);
+            context.SaveChanges();
+            Console.WriteLine("Самолеты добавлены.");
 
-                // Список городов для рейсов
-                string[] cities = {
-                    "Москва", "Санкт-Петербург", "Сочи", "Екатеринбург", "Новосибирск",
-                    "Краснодар", "Казань", "Самара", "Ростов-на-Дону", "Уфа",
-                    "Красноярск", "Пермь", "Воронеж", "Волгоград", "Минеральные Воды",
-                    "Тюмень", "Кемерово", "Мурманск", "Калининград", "Анапа",
-                    "Стамбул", "Дубай", "Париж", "Рим", "Барселона",
-                    "Берлин", "Лондон", "Нью-Йорк", "Токио", "Пекин"
-                };
+            // Создаем список рейсов, посадок, вылетов и билетов
+            var flights = new List<Flight>();
+            var departures = new List<Departure>();
+            var landings = new List<Landing>();
+            var tickets = new List<Ticket>();
 
-                // Случайная генерация рейсов
-                var random = new Random();
-                var flights = new List<Flight>();
-                var airlines = new string[] { "SU", "S7", "U6", "DP", "UT", "N4", "5N", "EO", "TK", "EK" };
-                
-                for (int i = 0; i < 60; i++)
+            var random = new Random();
+            string[] airlines = { "SU", "S7", "U6", "DP", "UT" };
+            var today = DateTime.Today;
+
+            // Список статусов рейсов
+            string[] statuses = { "Активен", "Задержан", "Отменен", "Прибыл", "Вылетел" };
+
+            int flightCounter = 1;
+
+            // Функция для создания рейсов между городами
+            void CreateFlights(string departureCity, string arrivalCity, int count, decimal minPrice, decimal maxPrice, int startHour = 6, int endHour = 22)
+            {
+                for (int i = 0; i < count; i++)
                 {
-                    var aircraft = aircrafts[random.Next(aircrafts.Length)];
-                    var airline = airlines[random.Next(airlines.Length)];
-                    var flightNumber = $"{airline}{random.Next(1000, 9999)}";
+                    // Выбираем случайный самолет
+                    var aircraft = aircrafts[random.Next(aircrafts.Count)];
                     
-                    // Случайно определяем, сколько мест уже занято
-                    int occupiedSeats = random.Next(0, (int)(aircraft.SeatCount * 0.9));
-                    var availableSeats = aircraft.SeatCount - occupiedSeats;
+                    // Генерируем номер рейса
+                    string airline = airlines[random.Next(airlines.Length)];
+                    string flightNumber = $"{airline}{random.Next(1000, 9999)}";
                     
-                    // Случайная цена от 5000 до 150000
-                    var basePrice = random.Next(5000, 150000);
-                    // Округление цены до "красивых" значений (кратно 500)
-                    var price = (decimal)(Math.Round(basePrice / 500.0, 0) * 500);
+                    // Случайное время вылета
+                    var departureHour = random.Next(startHour, endHour);
+                    var departureMinute = random.Next(0, 4) * 15; // 0, 15, 30, 45
+                    var departureTime = today.AddDays(random.Next(1, 30))
+                        .AddHours(departureHour)
+                        .AddMinutes(departureMinute);
                     
-                    // Случайная дата в ближайшие 30 дней
-                    var departureTime = DateTime.Now.AddDays(random.Next(1, 30))
-                        .AddHours(random.Next(0, 24))
-                        .AddMinutes(random.Next(0, 4) * 15); // Округляем до 0, 15, 30, 45 минут
+                    // Определяем время в пути в зависимости от направления
+                    int flightDurationHours;
+                    if ((departureCity == "Москва" && arrivalCity == "Санкт-Петербург") ||
+                        (departureCity == "Санкт-Петербург" && arrivalCity == "Москва"))
+                    {
+                        flightDurationHours = 1; // Короткие рейсы
+                    }
+                    else if (departureCity == "Москва" && 
+                           (arrivalCity == "Казань" || arrivalCity == "Краснодар" || 
+                            arrivalCity == "Калининград" || arrivalCity == "Сочи"))
+                    {
+                        flightDurationHours = 2; // Средние рейсы
+                    }
+                    else
+                    {
+                        flightDurationHours = 4; // Длинные рейсы (например, до Новосибирска или Екатеринбурга)
+                    }
                     
-                    flights.Add(new Flight 
-                    { 
-                        FlightNumber = flightNumber, 
-                        AircraftId = aircraft.Id, 
+                    // Случайная цена в заданном диапазоне
+                    decimal price = random.Next((int)minPrice, (int)maxPrice + 1);
+                    
+                    // Случайное количество доступных мест (немного меньше, чем общее количество мест)
+                    int soldSeats = random.Next(0, (int)(aircraft.SeatCount * 0.8));
+                    int availableSeats = aircraft.SeatCount - soldSeats;
+                    
+                    // Случайный статус рейса (преимущественно активные)
+                    string status = random.Next(100) < 80 ? "Активен" : statuses[random.Next(1, statuses.Length)];
+
+                    // Создаем рейс
+                    var flight = new Flight
+                    {
+                        FlightNumber = flightNumber,
+                        AircraftId = aircraft.Id,
                         DepartureTime = departureTime,
                         AvailableSeats = availableSeats,
-                        Price = price
-                    });
-                }
-
-                foreach (var flight in flights)
-                {
-                    context.Flights.Add(flight);
-                }
-                context.SaveChanges();
-
-                // Добавляем посадки и вылеты для всех рейсов
-                var landings = new List<Landing>();
-                var departures = new List<Departure>();
-                
-                foreach (var flight in flights)
-                {
-                    // Выбираем случайный город отправления
-                    string departureCity = cities[random.Next(cities.Length)];
+                        Price = price,
+                        Status = status
+                    };
                     
-                    // Выбираем случайный город назначения, но убедимся, что он отличается от города отправления
-                    string arrivalCity;
-                    do 
-                    {
-                        arrivalCity = cities[random.Next(cities.Length)];
-                    } while (arrivalCity == departureCity);
+                    flights.Add(flight);
                     
-                    // Добавляем вылет
-                    departures.Add(new Departure 
-                    { 
-                        Location = departureCity, 
-                        Time = flight.DepartureTime, 
-                        FlightId = flight.Id 
-                    });
-                    
-                    // Добавляем посадку (примерно через 1-8 часов после вылета)
-                    var flightDuration = TimeSpan.FromHours(random.Next(1, 9));
-                    landings.Add(new Landing 
-                    { 
-                        Location = arrivalCity, 
-                        Time = flight.DepartureTime.Add(flightDuration), 
-                        FlightId = flight.Id 
-                    });
+                    // Счетчик для отслеживания общего количества рейсов
+                    flightCounter++;
                 }
-
-                foreach (var departure in departures)
-                {
-                    context.Departures.Add(departure);
-                }
-                
-                foreach (var landing in landings)
-                {
-                    context.Landings.Add(landing);
-                }
-                context.SaveChanges();
-
-                // Добавляем билеты (продаем несколько билетов)
-                var tickets = new List<Ticket>();
-                
-                // Для каждого полета создаем от 0 до 20 билетов
-                foreach (var flight in flights)
-                {
-                    int ticketsToCreate = random.Next(0, 21);
-                    
-                    // Множество для отслеживания занятых мест
-                    var occupiedSeats = new HashSet<string>();
-                    
-                    for (int i = 0; i < ticketsToCreate && flight.AvailableSeats > 0; i++)
-                    {
-                        // Генерация номера места (ряд от 1 до 50, место от A до F)
-                        string seatNumber;
-                        do
-                        {
-                            int row = random.Next(1, 51);
-                            char letter = (char)('A' + random.Next(0, 6)); // A-F
-                            seatNumber = $"{row}{letter}";
-                        } while (occupiedSeats.Contains(seatNumber));
-                        
-                        occupiedSeats.Add(seatNumber);
-                        
-                        // Генерация случайных данных для пассажира
-                        string[] firstNames = { "Иван", "Петр", "Александр", "Сергей", "Дмитрий", "Алексей", "Михаил", "Николай", "Андрей", "Владимир" };
-                        string[] lastNames = { "Иванов", "Петров", "Сидоров", "Смирнов", "Кузнецов", "Попов", "Васильев", "Соколов", "Михайлов", "Новиков" };
-                        string[] patronymics = { "Иванович", "Петрович", "Александрович", "Сергеевич", "Дмитриевич", "Алексеевич", "Михайлович", "Николаевич", "Андреевич", "Владимирович" };
-                        
-                        string passengerName = $"{lastNames[random.Next(lastNames.Length)]} {firstNames[random.Next(firstNames.Length)]} {patronymics[random.Next(patronymics.Length)]}";
-                        string docNumber = $"{random.Next(1000, 9999)} {random.Next(100000, 999999)}";
-                        string contactPhone = $"+7 ({random.Next(900, 999)}) {random.Next(100, 999)}-{random.Next(10, 99)}-{random.Next(10, 99)}";
-                        string contactEmail = $"{lastNames[random.Next(lastNames.Length)].ToLower()}{random.Next(10, 99)}@{new string[] { "gmail.com", "mail.ru", "yandex.ru", "outlook.com" }[random.Next(4)]}";
-                        
-                        // Определяем источник покупки (20% онлайн, 80% оффлайн)
-                        string purchaseSource = random.Next(0, 100) < 20 ? "Online" : "Offline";
-                        string cashboxNumber = purchaseSource == "Online" ? "0" : random.Next(1, 10).ToString();
-                        
-                        // Определяем статус билета (80% оплачены, 15% забронированы, 5% отменены)
-                        int statusRandom = random.Next(0, 100);
-                        string status;
-                        if (statusRandom < 80) status = "Paid";
-                        else if (statusRandom < 95) status = "Booked";
-                        else status = "Cancelled";
-                        
-                        // Определяем, принадлежит ли билет пользователю
-                        int? userId = purchaseSource == "Online" ? 2 : null;
-                        
-                        tickets.Add(new Ticket 
-                        { 
-                            TicketNumber = GenerateTicketNumber(),
-                            CashboxNumber = cashboxNumber, 
-                            FlightId = flight.Id, 
-                            Date = DateTime.Today.AddDays(-random.Next(0, 14)), // Билет мог быть куплен в течение последних двух недель
-                            Time = DateTime.Now.AddHours(-random.Next(0, 24)).TimeOfDay,
-                            SeatNumber = seatNumber,
-                            PassengerName = passengerName,
-                            DocumentNumber = docNumber,
-                            ContactPhone = contactPhone,
-                            ContactEmail = contactEmail,
-                            PurchaseSource = purchaseSource,
-                            Status = status,
-                            UserId = userId
-                        });
-                        
-                        // Уменьшаем количество свободных мест на рейсе (только для оплаченных и забронированных билетов)
-                        if (status != "Cancelled")
-                        {
-                            flight.AvailableSeats--;
-                        }
-                    }
-                }
-                
-                foreach (var ticket in tickets)
-                {
-                    context.Tickets.Add(ticket);
-                }
-                context.SaveChanges();
             }
-        }
 
-        // Вспомогательный метод для хеширования пароля
-        private static string HashPassword(string password)
-        {
-            using (var sha256 = SHA256.Create())
+            // Создаем рейсы по заданным направлениям
+            CreateFlights("Москва", "Санкт-Петербург", 10, 3000, 5000);
+            CreateFlights("Санкт-Петербург", "Москва", 10, 3000, 5000);
+            CreateFlights("Москва", "Казань", 7, 3000, 5000);
+            CreateFlights("Москва", "Новосибирск", 7, 8000, 12000);
+            CreateFlights("Москва", "Екатеринбург", 7, 5000, 7000);
+            CreateFlights("Москва", "Сочи", 7, 5000, 8000);
+            CreateFlights("Москва", "Краснодар", 7, 4000, 6000);
+            CreateFlights("Москва", "Калининград", 7, 4500, 6500);
+            CreateFlights("Санкт-Петербург", "Казань", 3, 4000, 6000);
+            CreateFlights("Санкт-Петербург", "Сочи", 3, 6000, 9000);
+            CreateFlights("Казань", "Москва", 3, 3000, 5000);
+            CreateFlights("Новосибирск", "Москва", 3, 8000, 12000);
+            
+            Console.WriteLine($"Создано {flights.Count} рейсов");
+            
+            // Сохраняем рейсы в базу данных
+            context.Flights.AddRange(flights);
+            context.SaveChanges();
+            
+            // Создаем посадки и вылеты для каждого рейса
+            int departureIndex = 0;
+            int landingIndex = 0;
+            
+            // Для каждого рейса создаем соответствующие записи посадки и вылета
+            foreach (var flight in flights)
             {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
+                // Определяем города прилета и вылета в зависимости от индекса рейса
+                string departureCity;
+                string arrivalCity;
+                
+                if (departureIndex < 10) // Первые 10 рейсов: Москва - Санкт-Петербург
+                {
+                    departureCity = "Москва";
+                    arrivalCity = "Санкт-Петербург";
+                }
+                else if (departureIndex < 20) // Следующие 10 рейсов: Санкт-Петербург - Москва
+                {
+                    departureCity = "Санкт-Петербург";
+                    arrivalCity = "Москва";
+                }
+                else if (departureIndex < 27) // Москва - Казань
+                {
+                    departureCity = "Москва";
+                    arrivalCity = "Казань";
+                }
+                else if (departureIndex < 34) // Москва - Новосибирск
+                {
+                    departureCity = "Москва";
+                    arrivalCity = "Новосибирск";
+                }
+                else if (departureIndex < 41) // Москва - Екатеринбург
+                {
+                    departureCity = "Москва";
+                    arrivalCity = "Екатеринбург";
+                }
+                else if (departureIndex < 48) // Москва - Сочи
+                {
+                    departureCity = "Москва";
+                    arrivalCity = "Сочи";
+                }
+                else if (departureIndex < 55) // Москва - Краснодар
+                {
+                    departureCity = "Москва";
+                    arrivalCity = "Краснодар";
+                }
+                else if (departureIndex < 62) // Москва - Калининград
+                {
+                    departureCity = "Москва";
+                    arrivalCity = "Калининград";
+                }
+                else if (departureIndex < 65) // Санкт-Петербург - Казань
+                {
+                    departureCity = "Санкт-Петербург";
+                    arrivalCity = "Казань";
+                }
+                else if (departureIndex < 68) // Санкт-Петербург - Сочи
+                {
+                    departureCity = "Санкт-Петербург";
+                    arrivalCity = "Сочи";
+                }
+                else if (departureIndex < 71) // Казань - Москва
+                {
+                    departureCity = "Казань";
+                    arrivalCity = "Москва";
+                }
+                else // Новосибирск - Москва
+                {
+                    departureCity = "Новосибирск";
+                    arrivalCity = "Москва";
+                }
+                
+                // Определяем время полета в зависимости от маршрута
+                int flightDurationHours;
+                if ((departureCity == "Москва" && arrivalCity == "Санкт-Петербург") ||
+                    (departureCity == "Санкт-Петербург" && arrivalCity == "Москва"))
+                {
+                    flightDurationHours = 1; // Короткие рейсы
+                }
+                else if (departureCity == "Москва" && 
+                       (arrivalCity == "Казань" || arrivalCity == "Краснодар" || 
+                        arrivalCity == "Калининград" || arrivalCity == "Сочи"))
+                {
+                    flightDurationHours = 2; // Средние рейсы
+                }
+                else
+                {
+                    flightDurationHours = 4; // Длинные рейсы
+                }
+                
+                // Создаем вылет
+                var departure = new Departure
+                {
+                    Location = departureCity,
+                    Time = flight.DepartureTime,
+                    FlightId = flight.Id
+                };
+                departures.Add(departure);
+                
+                // Создаем посадку (время посадки = время вылета + продолжительность полета)
+                var landing = new Landing
+                {
+                    Location = arrivalCity,
+                    Time = flight.DepartureTime.AddHours(flightDurationHours),
+                    FlightId = flight.Id
+                };
+                landings.Add(landing);
+                
+                // Создаем несколько билетов для рейса
+                int ticketsToCreate = random.Next(1, 10); // От 1 до 10 билетов на рейс
+                
+                for (int t = 0; t < ticketsToCreate && flight.AvailableSeats < 180; t++)
+                {
+                    // Генерируем номер места (ряд от 1 до 30, место от A до F)
+                    int row = random.Next(1, 31);
+                    char seat = (char)('A' + random.Next(0, 6)); // A-F
+                    string seatNumber = $"{row}{seat}";
+                    
+                    // Генерируем уникальный номер билета
+                    string ticketNumber = $"{GenerateRandomString(4)}-{GenerateRandomString(4)}-{GenerateRandomString(4)}";
+                    
+                    // Создаем билет
+                    var ticket = new Ticket
+                    {
+                        TicketNumber = ticketNumber,
+                        CashboxNumber = random.Next(1, 6).ToString(),
+                        FlightId = flight.Id,
+                        PassengerName = GenerateRandomName(),
+                        DocumentNumber = $"{random.Next(1000, 9999)} {random.Next(100000, 999999)}",
+                        SeatNumber = seatNumber,
+                        Date = today.AddDays(-random.Next(1, 15)), // Билет куплен от 1 до 15 дней назад
+                        Time = TimeSpan.FromHours(random.Next(9, 18)).Add(TimeSpan.FromMinutes(random.Next(0, 60))),
+                        PurchaseSource = random.Next(2) == 0 ? "Online" : "Offline",
+                        Status = "Paid"
+                    };
+                    
+                    tickets.Add(ticket);
+                }
+                
+                departureIndex++;
+                landingIndex++;
             }
+            
+            // Сохраняем посадки, вылеты и билеты в базу данных
+            context.Departures.AddRange(departures);
+            context.Landings.AddRange(landings);
+            context.Tickets.AddRange(tickets);
+            context.SaveChanges();
+            
+            Console.WriteLine($"Добавлено {departures.Count} вылетов, {landings.Count} посадок и {tickets.Count} билетов.");
+
+            Console.WriteLine("Инициализация базы данных завершена успешно.");
         }
         
-        // Метод для генерации уникального номера билета
-        private static string GenerateTicketNumber()
+        // Вспомогательный метод для генерации случайной строки заданной длины
+        private static string GenerateRandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
             
-            string part1 = new string(Enumerable.Repeat(chars, 4)
+            return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
-                
-            string part2 = new string(Enumerable.Repeat(chars, 4)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-                
-            string part3 = new string(Enumerable.Repeat(chars, 4)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-                
-            return $"{part1}-{part2}-{part3}";
+        }
+        
+        // Вспомогательный метод для генерации случайного имени
+        private static string GenerateRandomName()
+        {
+            string[] firstNames = { "Иван", "Петр", "Алексей", "Сергей", "Михаил", "Андрей", "Дмитрий", "Артем", "Максим", "Николай" };
+            string[] lastNames = { "Иванов", "Петров", "Сидоров", "Смирнов", "Кузнецов", "Соколов", "Попов", "Лебедев", "Козлов", "Новиков" };
+            
+            var random = new Random();
+            return $"{lastNames[random.Next(lastNames.Length)]} {firstNames[random.Next(firstNames.Length)]}";
         }
     }
 } 

@@ -12,7 +12,22 @@ builder.Services.AddRazorPages();
 
 // Add DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    // SQL Server подключение (закомментировано для использования SQLite)
+    /*
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), 
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        });
+    */
+    
+    // SQLite подключение (раскомментируйте эту строку для использования SQLite)
+    options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnection"));
+});
 
 // Add Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
