@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using System.Security.Claims;
 
 namespace Airport.Controllers
 {
@@ -78,8 +79,15 @@ namespace Airport.Controllers
         // GET: Бронирование билета (перенаправление на форму)
         [HttpGet]
         [Authorize]
-        public IActionResult BookTicket(int flightId)
+        public IActionResult BookTicket(int? flightId)
         {
+            // Если ID рейса не указан, перенаправляем на страницу поиска рейсов
+            if (!flightId.HasValue)
+            {
+                _notificationService.AddNotification("Информация", "Для бронирования билета сначала выберите рейс", NotificationService.NotificationType.Info);
+                return RedirectToAction("SearchFlights", "Home");
+            }
+            
             // Перенаправляем на метод BookingForm с тем же ID рейса
             return RedirectToAction("BookingForm", new { flightId = flightId });
         }
@@ -91,14 +99,52 @@ namespace Airport.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return BadRequest(ModelState);
+                }
+                return View("BookingForm", model);
             }
 
             // Проверяем наличие свободных мест на рейсе
             var flight = await _context.Flights.FindAsync(model.FlightId);
             if (flight == null || flight.AvailableSeats <= 0)
             {
-                return BadRequest("Нет свободных мест на данном рейсе");
+                var errorMessage = "Нет свободных мест на данном рейсе";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return BadRequest(errorMessage);
+                }
+                ModelState.AddModelError("", errorMessage);
+                return View("BookingForm", model);
+            }
+
+            // Получаем идентификатор текущего пользователя
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            
+            // Если claim не найден или его значение невозможно преобразовать в int
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                var errorMessage = "Не удалось определить идентификатор пользователя. Пожалуйста, войдите в систему заново.";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return BadRequest(errorMessage);
+                }
+                ModelState.AddModelError("", errorMessage);
+                return View("BookingForm", model);
+            }
+            
+            // Проверяем существование пользователя в базе данных
+            var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+            if (!userExists)
+            {
+                var errorMessage = "Пользователь не найден. Пожалуйста, войдите в систему заново.";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return BadRequest(errorMessage);
+                }
+                ModelState.AddModelError("", errorMessage);
+                return View("BookingForm", model);
             }
 
             // Генерируем случайный номер места
@@ -122,31 +168,66 @@ namespace Airport.Controllers
                 ContactEmail = model.ContactEmail,
                 PurchaseSource = "Online",
                 Status = "Paid",
-                UserId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ?? "0")
+                UserId = userId
             };
 
-            // Уменьшаем количество свободных мест
-            flight.AvailableSeats--;
-            
-            _context.Update(flight);
-            _context.Add(ticket);
-            await _context.SaveChangesAsync();
+            try
+            {
+                // Уменьшаем количество свободных мест
+                flight.AvailableSeats--;
+                
+                _context.Update(flight);
+                _context.Add(ticket);
+                await _context.SaveChangesAsync();
 
-            _notificationService.AddNotification("Успешно", "Билет успешно забронирован. Перейдите в раздел 'Мои билеты' для просмотра.", NotificationService.NotificationType.Success);
-            TempData["Notifications"] = System.Text.Json.JsonSerializer.Serialize(_notificationService.GetNotifications());
+                _notificationService.AddNotification("Успешно", "Билет успешно забронирован. Перейдите в раздел 'Мои билеты' для просмотра.", NotificationService.NotificationType.Success);
+                TempData["Notifications"] = System.Text.Json.JsonSerializer.Serialize(_notificationService.GetNotifications());
 
-            // Возвращаем JSON с результатом бронирования
-            return Json(new { success = true, message = "Билет успешно забронирован", ticketId = ticket.Id });
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    // Для AJAX-запросов возвращаем JSON
+                    return Json(new { success = true, message = "Билет успешно забронирован", ticketId = ticket.Id });
+                }
+                
+                // Для обычных запросов перенаправляем на страницу подтверждения
+                return RedirectToAction("BookingSuccess", new { ticketId = ticket.Id });
+            }
+            catch (DbUpdateException ex)
+            {
+                // Логируем ошибку
+                Console.Error.WriteLine($"Ошибка при бронировании билета: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.Error.WriteLine($"Внутренняя ошибка: {ex.InnerException.Message}");
+                }
+                
+                var errorMessage = "Произошла ошибка при бронировании билета. Пожалуйста, попробуйте позже.";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return BadRequest(errorMessage);
+                }
+                ModelState.AddModelError("", errorMessage);
+                return View("BookingForm", model);
+            }
         }
 
         // GET: Мои билеты
         [HttpGet]
         public async Task<IActionResult> MyTickets()
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ?? "0");
+            // Получаем идентификатор пользователя из клеймов
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                _notificationService.AddNotification("Ошибка", "Не удалось определить ваш профиль. Пожалуйста, войдите в систему заново.", NotificationService.NotificationType.Error);
+                return RedirectToAction("Login", "Auth");
+            }
+            
             var tickets = await _context.Tickets
                 .Include(t => t.Flight)
                 .Include(t => t.Flight.Aircraft)
+                .Include(t => t.Flight.Landings)
+                .Include(t => t.Flight.Departures)
                 .Where(t => t.UserId == userId)
                 .OrderByDescending(t => t.Date)
                 .ThenByDescending(t => t.Time)
@@ -159,7 +240,14 @@ namespace Airport.Controllers
         [HttpGet]
         public async Task<IActionResult> FlightHistory()
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value ?? "0");
+            // Получаем идентификатор пользователя из клеймов
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                _notificationService.AddNotification("Ошибка", "Не удалось определить ваш профиль. Пожалуйста, войдите в систему заново.", NotificationService.NotificationType.Error);
+                return RedirectToAction("Login", "Auth");
+            }
+            
             var tickets = await _context.Tickets
                 .Include(t => t.Flight)
                 .Include(t => t.Flight.Aircraft)
@@ -169,6 +257,36 @@ namespace Airport.Controllers
                 .ToListAsync();
 
             return View(tickets);
+        }
+        
+        // GET: Страница подтверждения успешного бронирования
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> BookingSuccess(int ticketId)
+        {
+            // Получаем информацию о билете
+            var ticket = await _context.Tickets
+                .Include(t => t.Flight)
+                .Include(t => t.Flight.Aircraft)
+                .Include(t => t.Flight.Landings)
+                .Include(t => t.Flight.Departures)
+                .FirstOrDefaultAsync(t => t.Id == ticketId);
+            
+            if (ticket == null)
+            {
+                _notificationService.AddNotification("Ошибка", "Билет не найден", NotificationService.NotificationType.Error);
+                return RedirectToAction("MyTickets");
+            }
+            
+            // Проверяем, что билет принадлежит текущему пользователю
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || ticket.UserId != userId)
+            {
+                _notificationService.AddNotification("Ошибка", "У вас нет доступа к этому билету", NotificationService.NotificationType.Error);
+                return RedirectToAction("MyTickets");
+            }
+            
+            return View(ticket);
         }
         
         // Вспомогательный метод для генерации случайного места

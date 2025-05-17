@@ -3,7 +3,7 @@
 <div class="booking-form">
     <h5 class="mb-3">Информация о пассажире</h5>
     
-    <form id="bookingForm" method="post" asp-controller="Booking" asp-action="BookTicket">
+    <form id="bookingForm" method="post" asp-controller="Booking" asp-action="BookTicket" data-ajax="true">
         @Html.AntiForgeryToken()
         
         <input type="hidden" asp-for="FlightId" />
@@ -108,6 +108,9 @@
                 url: $(this).attr("action"),
                 type: "POST",
                 data: $(this).serialize(),
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                },
                 success: function (response) {
                     if (response.success) {
                         // Показываем сообщение об успехе
@@ -127,21 +130,37 @@
                 error: function (xhr) {
                     // Обработка ошибок валидации
                     if (xhr.status === 400) {
-                        let errors = xhr.responseJSON;
-                        let errorMessage = "Пожалуйста, исправьте следующие ошибки:<ul>";
+                        let errorMessage = "";
                         
-                        for (let key in errors) {
-                            if (errors.hasOwnProperty(key)) {
-                                errorMessage += "<li>" + errors[key] + "</li>";
+                        // Проверяем, является ли ответ JSON или строкой
+                        try {
+                            let errors = JSON.parse(xhr.responseText);
+                            errorMessage = "Пожалуйста, исправьте следующие ошибки:<ul>";
+                            
+                            for (let key in errors) {
+                                if (errors.hasOwnProperty(key)) {
+                                    errorMessage += "<li>" + errors[key] + "</li>";
+                                }
                             }
+                            errorMessage += "</ul>";
+                        } catch (e) {
+                            // Если не удалось распарсить JSON, используем текст ошибки как есть
+                            errorMessage = xhr.responseText;
                         }
-                        errorMessage += "</ul>";
                         
                         $(".booking-error").removeClass("d-none").find(".error-message").html(errorMessage);
+                    } else if (xhr.status === 500 && xhr.responseText.includes("FOREIGN KEY constraint failed")) {
+                        // Специальная обработка ошибки внешнего ключа
+                        $(".booking-error").removeClass("d-none")
+                            .find(".error-message")
+                            .html("Произошла ошибка при бронировании билета: проблема с идентификацией пользователя.<br>Пожалуйста, выйдите из системы и войдите снова.");
                     } else {
                         // Общая ошибка
-                        $(".booking-error").removeClass("d-none").find(".error-message").text("Произошла ошибка при бронировании билета. Пожалуйста, попробуйте еще раз.");
+                        $(".booking-error").removeClass("d-none")
+                            .find(".error-message")
+                            .text("Произошла ошибка при бронировании билета. Пожалуйста, попробуйте еще раз.");
                     }
+                    
                     $("#bookingButton").prop("disabled", false).html('<i class="fas fa-ticket-alt me-2"></i>Забронировать');
                 }
             });
