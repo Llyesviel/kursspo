@@ -87,7 +87,7 @@
                         </div>
                         <div class="card-footer d-flex justify-content-between align-items-center">
                             <div class="small text-muted">
-                                Дата покупки: @ticket.Date.ToString("dd.MM.yyyy") @ticket.Time.ToString("HH:mm")
+                                Дата покупки: @ticket.Date.ToString("dd.MM.yyyy") @ticket.Time.ToString(@"hh\:mm")
                             </div>
                             <button class="btn btn-sm btn-outline-primary" onclick="printTicket('@ticket.TicketNumber')">
                                 <i class="fas fa-print"></i> Печать

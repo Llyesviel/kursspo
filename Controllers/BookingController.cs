@@ -223,6 +223,7 @@ namespace Airport.Controllers
                 return RedirectToAction("Login", "Auth");
             }
             
+            // Получаем данные без сортировки по времени
             var tickets = await _context.Tickets
                 .Include(t => t.Flight)
                 .Include(t => t.Flight.Aircraft)
@@ -230,8 +231,13 @@ namespace Airport.Controllers
                 .Include(t => t.Flight.Departures)
                 .Where(t => t.UserId == userId)
                 .OrderByDescending(t => t.Date)
-                .ThenByDescending(t => t.Time)
                 .ToListAsync();
+
+            // Сортируем результаты в памяти с помощью LINQ to Objects
+            tickets = tickets
+                .OrderByDescending(t => t.Date)
+                .ThenByDescending(t => t.Time)
+                .ToList();
 
             return View(tickets);
         }
@@ -248,13 +254,21 @@ namespace Airport.Controllers
                 return RedirectToAction("Login", "Auth");
             }
             
+            // Получаем данные c включением Departures и Landings
             var tickets = await _context.Tickets
                 .Include(t => t.Flight)
                 .Include(t => t.Flight.Aircraft)
+                .Include(t => t.Flight.Departures)
+                .Include(t => t.Flight.Landings)
                 .Where(t => t.UserId == userId)
                 .OrderByDescending(t => t.Date)
-                .ThenByDescending(t => t.Time)
                 .ToListAsync();
+
+            // Сортируем результаты в памяти с помощью LINQ to Objects
+            tickets = tickets
+                .OrderByDescending(t => t.Date)
+                .ThenByDescending(t => t.Time)
+                .ToList();
 
             return View(tickets);
         }

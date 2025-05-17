@@ -891,3 +891,123 @@ footer .copyright {
     font-size: 0.9rem;
     padding: 6px 10px;
 }
+
+/* Стили для слайдера с изображениями */
+.image-slider-section {
+    background-color: var(--background-light);
+    padding: 30px 0;
+}
+
+.carousel {
+    box-shadow: var(--card-shadow);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background-color: #f0f0f0; /* Добавляем фоновый цвет для заполнения пустых мест */
+}
+
+.carousel-inner {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.carousel-item {
+    height: 400px; /* Уменьшенная высота для равномерного отображения */
+    position: relative;
+}
+
+.carousel-item img {
+    width: 80%; /* Уменьшаем до 80% от ширины карусели для эффекта отдаленности */
+    height: 85%; /* Уменьшаем до 85% от высоты карусели */
+    object-fit: cover; /* Важно для равномерного отображения изображений */
+    object-position: center;
+    margin: 0 auto; /* Центрируем изображение */
+    display: block; /* Устанавливаем блочное отображение */
+    border-radius: 8px; /* Добавляем скругление краев изображений */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Добавляем легкую тень */
+    filter: brightness(0.95); /* Немного снижаем яркость для сокрытия дефектов */
+}
+
+/* Специальный стиль для 4-го изображения в карусели */
+.carousel-item:nth-child(4) img {
+    width: 80%; /* Стандартная ширина как у всех изображений */
+    height: 85%; /* Стандартная высота как у всех изображений */
+    filter: brightness(0.95); /* Стандартное затемнение как у всех изображений */
+    transform: none; /* Убираем масштабирование */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Стандартная тень как у всех изображений */
+    margin-top: 0; /* Убираем отступ сверху */
+}
+
+.carousel-control-prev, 
+.carousel-control-next {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.8;
+}
+
+.carousel-control-prev {
+    left: 20px;
+}
+
+.carousel-control-next {
+    right: 20px;
+}
+
+.carousel-control-prev:hover, 
+.carousel-control-next:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    opacity: 1;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 24px;
+    height: 24px;
+    filter: invert(1) brightness(0.1); /* Делаем стрелки темными */
+}
+
+/* Индикаторы слайдов (точки) */
+.carousel-indicators {
+    bottom: 20px;
+}
+
+.carousel-indicators [data-bs-target] {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.carousel-indicators .active {
+    background-color: var(--primary-color);
+}
+
+@media (max-width: 767px) {
+    .carousel-item {
+        height: 250px; /* Меньшая высота для мобильных устройств */
+    }
+    
+    .carousel-item img {
+        width: 85%; /* Чуть больше ширины на мобильных устройствах */
+        height: 80%; /* Чуть меньше высоты на мобильных устройствах */
+    }
+    
+    .carousel-control-prev, 
+    .carousel-control-next {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .carousel-control-prev {
+        left: 10px;
+    }
+    
+    .carousel-control-next {
+        right: 10px;
+    }
+}
