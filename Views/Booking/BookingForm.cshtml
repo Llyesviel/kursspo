@@ -3,13 +3,13 @@
     ViewData["Title"] = "Бронирование билета";
 }
 
-<div class="container my-5">
+<div class="container mt-4">
     <div class="row">
-        <div class="col-md-8 offset-md-2">
+        <div class="col-12">
             <div class="card shadow">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-primary">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">Бронирование билета</h4>
+                        <h4 class="mb-0 text-white">Бронирование билета</h4>
                         <div>
                             <a asp-controller="Home" asp-action="SearchFlights" class="btn btn-sm btn-light">
                                 <i class="fas fa-arrow-left me-2"></i>Назад к поиску
@@ -19,23 +19,48 @@
                 </div>
                 <div class="card-body">
                     <div class="flight-info mb-4">
-                        <div class="row mb-3 p-3 bg-light rounded">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="mb-0">Информация о рейсе</h5>
+                            <span class="badge bg-primary">Рейс @Model.FlightNumber</span>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
-                                <h5 class="mb-3">Информация о рейсе</h5>
-                                <p><strong>Рейс:</strong> @Model.FlightNumber</p>
-                                <p><strong>Маршрут:</strong> @Model.DepartureCity → @Model.ArrivalCity</p>
-                                <p><strong>Вылет:</strong> @Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle mb-2 text-muted">Маршрут</h6>
+                                        <p class="card-text">
+                                            <strong>@Model.DepartureCity</strong>
+                                            <i class="fas fa-arrow-right mx-2"></i>
+                                            <strong>@Model.ArrivalCity</strong>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6 text-end">
-                                <h5 class="mb-3">Стоимость</h5>
-                                <div class="price-badge p-2 bg-white shadow-sm rounded">
-                                    <span class="price fs-3 fw-bold text-primary">@Model.Price ₽</span>
+                            <div class="col-md-3">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle mb-2 text-muted">Вылет</h6>
+                                        <p class="card-text">
+                                            <strong>@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle mb-2 text-muted">Стоимость</h6>
+                                        <p class="card-text">
+                                            <strong>@Model.Price.ToString("N0") ₽</strong>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <partial name="_BookingForm" model="Model" />
+
+                    <h5 class="mb-3">Данные пассажира</h5>
+                    <partial name="_BookingForm" model="@Model" />
                 </div>
             </div>
         </div>
@@ -43,41 +68,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        $(document).ready(function() {
-            $('#bookingForm').submit(function(e) {
-                e.preventDefault();
-                
-                // Отображаем индикатор загрузки
-                $('#bookingBtn').html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Обработка...');
-                $('#bookingBtn').prop('disabled', true);
-                
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        if (response.success) {
-                            $('.booking-form').addClass('d-none');
-                            $('#bookingSuccess').removeClass('d-none');
-                        }
-                    },
-                    error: function(xhr) {
-                        // Восстанавливаем кнопку
-                        $('#bookingBtn').html('<i class="fas fa-check-circle me-2"></i> Подтвердить бронирование');
-                        $('#bookingBtn').prop('disabled', false);
-                        
-                        // Показываем ошибку
-                        let errorMsg = 'Произошла ошибка при бронировании билета';
-                        try {
-                            errorMsg = xhr.responseText || errorMsg;
-                        } catch(e) {}
-                        
-                        $('#bookingErrorMessage').text(errorMsg);
-                        $('#bookingError').removeClass('d-none');
-                    }
-                });
-            });
-        });
-    </script>
+    <partial name="_ValidationScriptsPartial" />
 } 

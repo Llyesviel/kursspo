@@ -6,6 +6,8 @@ using Airport.Models;
 using Airport.Services;
 using System.Threading.Tasks;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace Airport.Controllers
 {
@@ -208,10 +210,28 @@ namespace Airport.Controllers
         public string DepartureCity { get; set; } = string.Empty;
         public string ArrivalCity { get; set; } = string.Empty;
         public int SeatNumber { get; set; }
+        
+        [Required(ErrorMessage = "ФИО пассажира обязательно")]
+        [RegularExpression(@"^[А-ЯЁ][а-яё]+ [А-ЯЁ][а-яё]+ [А-ЯЁ][а-яё]+$", 
+            ErrorMessage = "ФИО должно быть в формате 'Иванов Иван Иванович'")]
+        [Display(Name = "ФИО пассажира")]
         public string PassengerName { get; set; } = string.Empty;
+        
+        [Required(ErrorMessage = "Номер документа обязателен")]
+        [RegularExpression(@"^\d{4}\s\d{6}$", 
+            ErrorMessage = "Номер документа должен быть в формате '1234 567899' (10 цифр)")]
+        [Display(Name = "Номер документа")]
         public string DocumentNumber { get; set; } = string.Empty;
+        
+        [Required(ErrorMessage = "Контактный телефон обязателен")]
+        [Display(Name = "Контактный телефон")]
         public string ContactPhone { get; set; } = string.Empty;
+        
+        [Required(ErrorMessage = "Email обязателен")]
+        [EmailAddress(ErrorMessage = "Введите корректный email адрес")]
+        [Display(Name = "Email")]
         public string ContactEmail { get; set; } = string.Empty;
+        
         public decimal Price { get; set; }
         public DateTime BookingDate { get; set; }
         public string Status { get; set; } = string.Empty;

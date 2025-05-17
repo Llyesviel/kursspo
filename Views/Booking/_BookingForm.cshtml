@@ -4,6 +4,8 @@
     <h5 class="mb-3">Информация о пассажире</h5>
     
     <form id="bookingForm" method="post" asp-controller="Booking" asp-action="BookTicket">
+        @Html.AntiForgeryToken()
+        
         <input type="hidden" asp-for="FlightId" />
         <input type="hidden" asp-for="FlightNumber" />
         <input type="hidden" asp-for="DepartureTime" />
@@ -11,84 +13,136 @@
         <input type="hidden" asp-for="DepartureCity" />
         <input type="hidden" asp-for="ArrivalCity" />
         
-        <div class="mb-3">
-            <label asp-for="PassengerName" class="form-label">ФИО пассажира</label>
-            <input asp-for="PassengerName" class="form-control" required />
-            <span asp-validation-for="PassengerName" class="text-danger"></span>
+        <div class="flight-details mb-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="PassengerName" class="form-label">ФИО пассажира <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="PassengerName" name="PassengerName" 
+                               asp-for="PassengerName" placeholder="Иванов Иван Иванович" required />
+                        <span asp-validation-for="PassengerName" class="text-danger"></span>
+                        <small class="form-text text-muted">Введите полное ФИО как в документе</small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="DocumentNumber" class="form-label">Номер паспорта <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="DocumentNumber" name="DocumentNumber" 
+                               asp-for="DocumentNumber" placeholder="1234 567899" required />
+                        <span asp-validation-for="DocumentNumber" class="text-danger"></span>
+                        <small class="form-text text-muted">Формат: 1234 567899 (10 цифр с пробелом)</small>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="ContactPhone" class="form-label">Контактный телефон <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" id="ContactPhone" name="ContactPhone" 
+                               asp-for="ContactPhone" placeholder="+7 (999) 123-45-67" required />
+                        <span asp-validation-for="ContactPhone" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="ContactEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="ContactEmail" name="ContactEmail" 
+                               asp-for="ContactEmail" placeholder="example@mail.ru" required />
+                        <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="mb-3">
-            <label asp-for="DocumentNumber" class="form-label">Номер документа (паспорт)</label>
-            <input asp-for="DocumentNumber" class="form-control" required />
-            <span asp-validation-for="DocumentNumber" class="text-danger"></span>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Номер места будет назначен автоматически после подтверждения бронирования.
         </div>
-        
-        <div class="mb-3">
-            <label asp-for="ContactPhone" class="form-label">Контактный телефон</label>
-            <input asp-for="ContactPhone" class="form-control" required placeholder="+7 (xxx) xxx-xx-xx" />
-            <span asp-validation-for="ContactPhone" class="text-danger"></span>
+
+        <div class="booking-success alert alert-success d-none">
+            <i class="fas fa-check-circle me-2"></i>
+            Билет успешно забронирован! Вы можете просмотреть информацию о билете в разделе "Мои билеты".
         </div>
-        
-        <div class="mb-3">
-            <label asp-for="ContactEmail" class="form-label">Email</label>
-            <input asp-for="ContactEmail" type="email" class="form-control" required />
-            <span asp-validation-for="ContactEmail" class="text-danger"></span>
+
+        <div class="booking-error alert alert-danger d-none">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span class="error-message"></span>
         </div>
-        
-        <div class="alert alert-info mb-3">
-            <small>
-                <i class="fas fa-info-circle me-2"></i>
-                Место будет назначено автоматически. Билет будет привязан к вашему аккаунту.
-            </small>
-        </div>
-        
-        <div id="bookingError" class="alert alert-danger mb-3 d-none">
-            <small>
-                <i class="fas fa-exclamation-circle me-2"></i>
-                <span id="bookingErrorMessage">Ошибка при бронировании билета</span>
-            </small>
-        </div>
-        
-        <div class="d-grid">
-            <button id="bookingBtn" type="submit" class="btn btn-primary">
-                <i class="fas fa-check-circle me-2"></i> Подтвердить бронирование
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="#" onclick="history.back()" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Назад
+            </a>
+            <button type="submit" class="btn btn-primary" id="bookingButton">
+                <i class="fas fa-ticket-alt me-2"></i>Забронировать
             </button>
         </div>
     </form>
 </div>
 
-<div id="bookingSuccess" class="booking-success d-none">
-    <div class="text-center py-4">
-        <div class="success-icon mb-3">
-            <i class="fas fa-check-circle text-success" style="font-size: 64px;"></i>
-        </div>
-        <h4>Билет успешно забронирован!</h4>
-        <p class="text-muted">Информация о билете доступна в разделе "Мои билеты"</p>
-        <div class="mt-4">
-            <a href="/Booking/MyTickets" class="btn btn-primary">
-                <i class="fas fa-ticket-alt me-2"></i> Перейти к моим билетам
-            </a>
-        </div>
-    </div>
-</div>
-
 <script>
     $(document).ready(function() {
-        $('#bookingForm').submit(function(e) {
+        // Маска для паспорта
+        $("#DocumentNumber").on("input", function() {
+            let value = $(this).val().replace(/\D/g, ''); // Оставляем только цифры
+            if (value.length > 4) {
+                value = value.substring(0, 4) + ' ' + value.substring(4, 10);
+            }
+            $(this).val(value);
+        });
+
+        // Отправка формы через AJAX
+        $("#bookingForm").on("submit", function (e) {
             e.preventDefault();
-            
+
+            // Валидация формы на стороне клиента
+            if (!$(this)[0].checkValidity()) {
+                $(this).addClass('was-validated');
+                return false;
+            }
+
+            // Показываем индикатор загрузки
+            $("#bookingButton").prop("disabled", true).html('<span class="spinner-border spinner-border-sm me-2"></span>Обработка...');
+
             $.ajax({
-                url: $(this).attr('action'),
-                type: 'POST',
+                url: $(this).attr("action"),
+                type: "POST",
                 data: $(this).serialize(),
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
-                        $('.booking-form').addClass('d-none');
-                        $('#bookingSuccess').removeClass('d-none');
+                        // Показываем сообщение об успехе
+                        $(".booking-error").addClass("d-none");
+                        $(".booking-success").removeClass("d-none");
+                        
+                        // Перенаправляем пользователя на страницу с билетами через 2 секунды
+                        setTimeout(function() {
+                            window.location.href = "/Booking/MyTickets";
+                        }, 2000);
+                    } else {
+                        // Показываем сообщение об ошибке
+                        $(".booking-error").removeClass("d-none").find(".error-message").text(response.message);
+                        $("#bookingButton").prop("disabled", false).html('<i class="fas fa-ticket-alt me-2"></i>Забронировать');
                     }
                 },
-                error: function(xhr) {
-                    alert('Ошибка при бронировании: ' + xhr.responseText);
+                error: function (xhr) {
+                    // Обработка ошибок валидации
+                    if (xhr.status === 400) {
+                        let errors = xhr.responseJSON;
+                        let errorMessage = "Пожалуйста, исправьте следующие ошибки:<ul>";
+                        
+                        for (let key in errors) {
+                            if (errors.hasOwnProperty(key)) {
+                                errorMessage += "<li>" + errors[key] + "</li>";
+                            }
+                        }
+                        errorMessage += "</ul>";
+                        
+                        $(".booking-error").removeClass("d-none").find(".error-message").html(errorMessage);
+                    } else {
+                        // Общая ошибка
+                        $(".booking-error").removeClass("d-none").find(".error-message").text("Произошла ошибка при бронировании билета. Пожалуйста, попробуйте еще раз.");
+                    }
+                    $("#bookingButton").prop("disabled", false).html('<i class="fas fa-ticket-alt me-2"></i>Забронировать');
                 }
             });
         });
