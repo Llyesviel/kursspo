@@ -36,6 +36,18 @@ namespace Airport.Controllers
         }
 
         [AllowAnonymous]
+        public IActionResult Help()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public IActionResult Faq()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
         public async Task<IActionResult> FlightStatus(string flightNumber = "")
         {
             if (string.IsNullOrEmpty(flightNumber))

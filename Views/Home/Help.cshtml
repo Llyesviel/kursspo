@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Помощь";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 class="display-4">@ViewData["Title"]</h1>
+            <div class="alert alert-warning mt-4 py-5">
+                <h2 class="fw-bold">ПОМОЩИ НЕ БУДЕТ</h2>
+            </div>
+            
+            <div class="mt-5">
+                <div class="video-container">
+                    <video autoplay loop muted class="w-100" style="max-height: 500px;">
+                        <source src="~/videos/help.mp4" type="video/mp4">
+                        Ваш браузер не поддерживает видео.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
