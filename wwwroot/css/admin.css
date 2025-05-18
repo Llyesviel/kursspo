@@ -293,6 +293,11 @@
     color: var(--admin-danger);
 }
 
+.admin-stat-icon.purple {
+    background-color: rgba(142, 68, 173, 0.1);
+    color: #8e44ad;
+}
+
 .admin-stat-info {
     flex: 1;
 }

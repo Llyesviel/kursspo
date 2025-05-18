@@ -30,6 +30,7 @@ namespace Airport.Controllers
                 TotalFlights = await _context.Flights.CountAsync(),
                 TotalTickets = await _context.Tickets.CountAsync(),
                 TotalLandings = await _context.Landings.CountAsync(),
+                TotalDepartures = await _context.Departures.CountAsync(),
                 
                 // Получаем последние 5 зарегистрированных билетов
                 RecentTickets = await _context.Tickets
