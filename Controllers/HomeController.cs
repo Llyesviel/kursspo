@@ -103,13 +103,19 @@ namespace Airport.Controllers
         // Отчет о проданных билетах
         public async Task<IActionResult> TicketSalesReport()
         {
+            // Получаем данные без сортировки по времени (TimeSpan)
             var tickets = await _context.Tickets
                 .Include(t => t.Flight)
                 .Include(t => t.Flight.Aircraft)
                 .Include(t => t.Flight.Landings)
                 .OrderBy(t => t.Date)
-                .ThenBy(t => t.Time)
                 .ToListAsync();
+
+            // Сортируем результаты в памяти с помощью LINQ to Objects
+            tickets = tickets
+                .OrderBy(t => t.Date)
+                .ThenBy(t => t.Time)
+                .ToList();
 
             ViewBag.TotalSales = tickets.Sum(t => t.Flight.Price);
             ViewBag.TicketCount = tickets.Count;

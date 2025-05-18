@@ -43,11 +43,17 @@ namespace Airport.Controllers
             }
             else
             {
+                // Получаем данные без сортировки по времени (TimeSpan)
                 var landings = await _context.Landings
                     .Include(l => l.Flight)
                     .OrderBy(l => l.Flight.FlightNumber)
-                    .ThenBy(l => l.Time)
                     .ToListAsync();
+                
+                // Сортируем результаты в памяти
+                landings = landings
+                    .OrderBy(l => l.Flight.FlightNumber)
+                    .ThenBy(l => l.Time)
+                    .ToList();
                 
                 return View(landings);
             }

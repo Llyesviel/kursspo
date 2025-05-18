@@ -25,15 +25,15 @@ namespace Airport.Data
             var users = new List<User>
             {
                 new User { 
-                    Username = "admin", 
+                    Username = "admin",
                     Email = "admin@example.com", 
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin"), 
                     Role = "Admin", 
                     CreatedAt = DateTime.Now 
                 },
                 new User { 
-                    Username = "user", 
-                    Email = "user@example.com", 
+                    Username = "user",
+                    Email = "user@example.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("user"), 
                     Role = "User", 
                     CreatedAt = DateTime.Now 
@@ -41,7 +41,7 @@ namespace Airport.Data
             };
             
             context.Users.AddRange(users);
-            context.SaveChanges();
+                context.SaveChanges();
             Console.WriteLine("Пользователи добавлены.");
 
             // Добавляем самолеты
@@ -60,7 +60,7 @@ namespace Airport.Data
             };
             
             context.Aircrafts.AddRange(aircrafts);
-            context.SaveChanges();
+                context.SaveChanges();
             Console.WriteLine("Самолеты добавлены.");
 
             // Создаем список рейсов, посадок, вылетов и билетов
@@ -69,7 +69,7 @@ namespace Airport.Data
             var landings = new List<Landing>();
             var tickets = new List<Ticket>();
 
-            var random = new Random();
+                var random = new Random();
             string[] airlines = { "SU", "S7", "U6", "DP", "UT" };
             var today = DateTime.Today;
 
@@ -127,9 +127,9 @@ namespace Airport.Data
 
                     // Создаем рейс
                     var flight = new Flight
-                    {
-                        FlightNumber = flightNumber,
-                        AircraftId = aircraft.Id,
+                    { 
+                        FlightNumber = flightNumber, 
+                        AircraftId = aircraft.Id, 
                         DepartureTime = departureTime,
                         AvailableSeats = availableSeats,
                         Price = price,
@@ -168,7 +168,7 @@ namespace Airport.Data
             int landingIndex = 0;
             
             // Для каждого рейса создаем соответствующие записи посадки и вылета
-            foreach (var flight in flights)
+                foreach (var flight in flights)
             {
                 // Определяем города прилета и вылета в зависимости от индекса рейса
                 string departureCity;
@@ -289,10 +289,10 @@ namespace Airport.Data
                     {
                         TicketNumber = ticketNumber,
                         CashboxNumber = random.Next(1, 6).ToString(),
-                        FlightId = flight.Id,
+                            FlightId = flight.Id, 
                         PassengerName = GenerateRandomName(),
                         DocumentNumber = $"{random.Next(1000, 9999)} {random.Next(100000, 999999)}",
-                        SeatNumber = seatNumber,
+                            SeatNumber = seatNumber,
                         Date = today.AddDays(-random.Next(1, 15)), // Билет куплен от 1 до 15 дней назад
                         Time = TimeSpan.FromHours(random.Next(9, 18)).Add(TimeSpan.FromMinutes(random.Next(0, 60))),
                         PurchaseSource = random.Next(2) == 0 ? "Online" : "Offline",

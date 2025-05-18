@@ -45,12 +45,18 @@ namespace Airport.Controllers
             }
             else
             {
+                // Получаем данные без сортировки по времени (TimeSpan)
                 var departures = await _context.Departures
                     .Include(d => d.Flight)
                     .ThenInclude(f => f != null ? f.Aircraft : null)
                     .OrderBy(d => d.Flight != null ? d.Flight.FlightNumber : string.Empty)
-                    .ThenBy(d => d.Time)
                     .ToListAsync();
+                
+                // Сортируем результаты в памяти
+                departures = departures
+                    .OrderBy(d => d.Flight != null ? d.Flight.FlightNumber : string.Empty)
+                    .ThenBy(d => d.Time)
+                    .ToList();
                 
                 return View(departures);
             }
